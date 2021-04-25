@@ -1,0 +1,670 @@
+OpenShadingLanguage 1.00
+# Compiled by oslc 1.7.4.pixar38bde12
+# options: 
+shader jiWindowBox_Arnold
+param	int	zUpAxis	0		%meta{string,widget,"boolean"}  %read{28,28} %write{2147483647,-1}
+param	string	filename	""		%meta{string,widget,"filename"}  %read{245,257} %write{2147483647,-1}
+param	int	textureFlip	0		%meta{string,widget,"boolean"}  %read{15,229} %write{2147483647,-1} %derivs
+param	int	textureFlop	0		%meta{string,widget,"boolean"}  %read{20,216} %write{2147483647,-1} %derivs
+param	float	roomDepth	1		%meta{float,min,0.1} %meta{float,max,100}  %read{1,1} %write{2147483647,-1} %derivs
+param	float	widthOverscan	0		%meta{float,min,0} %meta{float,max,0.89999998}  %read{8,8} %write{2147483647,-1} %derivs
+param	float	heightOverscan	0		%meta{float,min,0} %meta{float,max,0.89999998}  %read{4,4} %write{2147483647,-1} %derivs
+param	int	enableMidground	0		%meta{string,widget,"boolean"}  %read{246,246} %write{2147483647,-1}
+param	float	midgroundDepth	0.5		%meta{float,min,0.050000001} %meta{float,max,99}  %read{13,13} %write{2147483647,-1} %derivs
+param	float	midgroundOffsetX	0		%read{23,23} %write{2147483647,-1} %derivs
+param	float	midgroundOffsetY	0		%read{18,18} %write{2147483647,-1} %derivs
+param	int	enableCurtains	0		%meta{string,widget,"boolean"}  %read{253,253} %write{2147483647,-1}
+oparam	color	outRGB	0 0 0		%read{2147483647,-1} %write{259,259}
+global	vector	I	%read{25,25} %write{2147483647,-1} %derivs
+global	float	u	%read{47,52} %write{2147483647,-1} %derivs
+global	float	v	%read{47,52} %write{2147483647,-1} %derivs
+local	float	roomDepthMult	%read{11,162} %write{2,2} %derivs
+local	float	heightOverscanMult	%read{37,55} %write{6,6} %derivs
+local	float	widthOverscanMult	%read{37,55} %write{10,10} %derivs
+local	float	midgroundDepthMult	%read{67,180} %write{14,14} %derivs
+local	float	midgroundOffY	%read{198,198} %write{19,19} %derivs
+local	float	midgroundOffX	%read{198,198} %write{24,24} %derivs
+local	vector	objI	%read{30,176} %write{27,46} %derivs
+local	color	objPOrig	%read{207,207} %write{51,51} %derivs
+local	color	objP	%read{61,178} %write{58,58} %derivs
+local	vector	sections	%read{61,153} %write{60,60} %derivs
+local	color	baseDepth	%read{72,77} %write{64,64} %derivs
+local	color	mgDepth	%read{2147483647,-1} %write{68,68}
+local	color	baseBack	%read{157,175} %write{71,71} %derivs
+local	color	baseWidth	%read{81,85} %write{72,72} %derivs
+local	color	baseDepthX	%read{95,95} %write{76,76} %derivs
+local	color	baseDepthY	%read{89,89} %write{80,80} %derivs
+local	color	baseWidthX	%read{91,91} %write{84,84} %derivs
+local	color	baseWidthY	%read{93,93} %write{88,88} %derivs
+local	float	horizU	%read{97,169} %write{90,90} %derivs
+local	float	vertU	%read{128,133} %write{92,92} %derivs
+local	float	horizV	%read{98,103} %write{94,94} %derivs
+local	float	vertV	%read{127,170} %write{96,96} %derivs
+local	float	sideWallsMask	%read{109,122} %write{102,102} %derivs
+local	color	sideWallsUV	%read{108,114} %write{104,104} %derivs
+local	color	rWallUV	%read{213,213} %write{111,111} %derivs
+local	color	lWallUV	%read{120,214} %write{118,126} %derivs
+local	float	FloorCeilMask	%read{139,152} %write{132,132} %derivs
+local	color	FloorCeilUV	%read{138,144} %write{134,134} %derivs
+local	color	ceilUV	%read{212,212} %write{141,141} %derivs
+local	color	floorUV	%read{150,212} %write{148,156} %derivs
+local	color	backWallUV	%read{215,215} %write{173,173} %derivs
+local	color	midgroundUV	%read{184,249} %write{183,238} %derivs
+local	float	midgroundMask	%read{200,200} %write{197,197} %derivs
+local	color	curtainsUV	%read{209,256} %write{207,242} %derivs
+local	color	finalUV	%read{226,244} %write{215,233} %derivs
+local	color	roomRGB	%read{251,252} %write{245,245}
+local	color	finalRGB	%read{258,259} %write{251,258}
+local	float	___309_midgroundA	%read{251,251} %write{250,250}
+local	color	___309_midgroundRGB	%read{251,251} %write{250,250}
+local	float	___311_curtainsA	%read{258,258} %write{257,257}
+local	color	___311_curtainsRGB	%read{258,258} %write{257,257}
+const	float	$const1	0.1		%read{2,24} %write{2147483647,-1}
+const	float	$const3	100		%read{1,1} %write{2147483647,-1}
+const	string	$const4	"clamp"		%read{0,12} %write{2147483647,-1}
+temp	float	$tmp1	%read{2,2} %write{1,1} %derivs
+const	int	$const5	1		%read{16,256} %write{2147483647,-1}
+temp	float	$tmp2	%read{6,6} %write{5,5} %derivs
+const	int	$const6	0		%read{28,255} %write{2147483647,-1}
+const	float	$const7	0		%read{5,198} %write{2147483647,-1}
+const	float	$const8	0.89999998		%read{4,8} %write{2147483647,-1}
+temp	float	$tmp3	%read{5,5} %write{4,4} %derivs
+const	float	$const9	1		%read{6,239} %write{2147483647,-1}
+temp	float	$tmp4	%read{10,10} %write{9,9} %derivs
+temp	float	$tmp5	%read{9,9} %write{8,8} %derivs
+const	float	$const10	0.050000001		%read{14,14} %write{2147483647,-1}
+const	float	$const11	0.0099999998		%read{11,11} %write{2147483647,-1}
+temp	float	$tmp6	%read{13,13} %write{11,11} %derivs
+temp	float	$tmp7	%read{14,14} %write{13,13} %derivs
+const	int	$const12	2		%read{15,175} %write{2147483647,-1}
+temp	int	$tmp8	%read{16,16} %write{15,15} %derivs
+temp	int	$tmp9	%read{17,17} %write{16,16} %derivs
+temp	float	$tmp10	%read{19,19} %write{18,18} %derivs
+temp	float	$tmp11	%read{18,18} %write{17,17} %derivs
+temp	int	$tmp12	%read{21,21} %write{20,20} %derivs
+temp	int	$tmp13	%read{22,22} %write{21,21} %derivs
+temp	float	$tmp14	%read{24,24} %write{23,23} %derivs
+temp	float	$tmp15	%read{23,23} %write{22,22} %derivs
+const	string	$const13	"object"		%read{27,27} %write{2147483647,-1}
+temp	vector	$tmp16	%read{27,27} %write{25,25} %derivs
+const	string	$const14	"transform"		%read{26,26} %write{2147483647,-1}
+const	string	$const15	"common"		%read{27,27} %write{2147483647,-1}
+temp	int	$tmp17	%read{29,29} %write{28,28}
+temp	vector	$tmp18	%read{38,38} %write{36,36} %derivs
+temp	float	$tmp19	%read{31,31} %write{30,30} %derivs
+temp	float	$tmp20	%read{36,36} %write{31,31} %derivs
+temp	float	$tmp21	%read{33,33} %write{32,32} %derivs
+temp	float	$tmp22	%read{36,36} %write{33,33} %derivs
+temp	float	$tmp23	%read{35,35} %write{34,34} %derivs
+temp	float	$tmp24	%read{36,36} %write{35,35} %derivs
+temp	color	$tmp25	%read{38,38} %write{37,37} %derivs
+temp	vector	$tmp26	%read{46,46} %write{44,44} %derivs
+temp	float	$tmp27	%read{40,40} %write{39,39} %derivs
+temp	float	$tmp28	%read{44,44} %write{40,40} %derivs
+temp	float	$tmp29	%read{44,44} %write{41,41} %derivs
+temp	float	$tmp30	%read{43,43} %write{42,42} %derivs
+temp	float	$tmp31	%read{44,44} %write{43,43} %derivs
+temp	color	$tmp32	%read{46,46} %write{45,45} %derivs
+temp	color	$tmp33	%read{48,48} %write{47,47} %derivs
+const	float	$const16	0.5		%read{47,96} %write{2147483647,-1}
+temp	color	$tmp34	%read{49,49} %write{48,48} %derivs
+const	float	$const17	2		%read{48,236} %write{2147483647,-1}
+temp	color	$tmp35	%read{50,50} %write{49,49} %derivs
+temp	color	$tmp36	%read{51,51} %write{50,50} %derivs
+temp	color	$tmp37	%read{53,53} %write{52,52} %derivs
+temp	color	$tmp38	%read{54,54} %write{53,53} %derivs
+temp	color	$tmp39	%read{56,56} %write{54,54} %derivs
+temp	color	$tmp40	%read{56,56} %write{55,55} %derivs
+temp	color	$tmp41	%read{57,57} %write{56,56} %derivs
+temp	color	$tmp42	%read{58,58} %write{57,57} %derivs
+temp	vector	$tmp43	%read{60,60} %write{59,59} %derivs
+temp	color	$tmp44	%read{64,64} %write{61,61} %derivs
+temp	vector	$tmp45	%read{63,63} %write{62,62} %derivs
+temp	vector	$tmp46	%read{64,64} %write{63,63} %derivs
+temp	color	$tmp47	%read{68,68} %write{65,65}
+temp	vector	$tmp48	%read{67,67} %write{66,66}
+temp	vector	$tmp49	%read{68,68} %write{67,67}
+temp	color	$tmp50	%read{71,71} %write{69,69} %derivs
+temp	vector	$tmp51	%read{71,71} %write{70,70} %derivs
+temp	float	$tmp52	%read{74,74} %write{73,73} %derivs
+temp	vector	$tmp53	%read{75,75} %write{74,74} %derivs
+temp	vector	$tmp54	%read{76,76} %write{75,75} %derivs
+temp	float	$tmp55	%read{78,78} %write{77,77} %derivs
+temp	vector	$tmp56	%read{79,79} %write{78,78} %derivs
+temp	vector	$tmp57	%read{80,80} %write{79,79} %derivs
+temp	float	$tmp58	%read{82,82} %write{81,81} %derivs
+temp	vector	$tmp59	%read{83,83} %write{82,82} %derivs
+temp	vector	$tmp60	%read{84,84} %write{83,83} %derivs
+temp	float	$tmp61	%read{86,86} %write{85,85} %derivs
+temp	vector	$tmp62	%read{87,87} %write{86,86} %derivs
+temp	vector	$tmp63	%read{88,88} %write{87,87} %derivs
+temp	float	$tmp64	%read{90,90} %write{89,89} %derivs
+temp	float	$tmp65	%read{92,92} %write{91,91} %derivs
+temp	float	$tmp66	%read{94,94} %write{93,93} %derivs
+temp	float	$tmp67	%read{96,96} %write{95,95} %derivs
+temp	float	$tmp68	%read{102,102} %write{97,97} %derivs
+temp	float	$tmp69	%read{102,102} %write{101,101} %derivs
+temp	float	$tmp70	%read{100,100} %write{99,99} %derivs
+temp	float	$tmp71	%read{99,99} %write{98,98} %derivs
+temp	float	$tmp72	%read{101,101} %write{100,100} %derivs
+temp	color	$tmp73	%read{104,104} %write{103,103} %derivs
+const	float	$const19	3		%read{104,239} %write{2147483647,-1}
+temp	color	$tmp74	%read{108,108} %write{107,107} %derivs
+temp	float	$tmp75	%read{107,107} %write{105,105} %derivs
+temp	float	$tmp76	%read{107,107} %write{106,106} %derivs
+temp	color	$tmp77	%read{109,109} %write{108,108} %derivs
+temp	color	$tmp78	%read{111,111} %write{109,109} %derivs
+temp	float	$tmp79	%read{111,111} %write{110,110} %derivs
+temp	color	$tmp80	%read{114,114} %write{113,113} %derivs
+temp	float	$tmp81	%read{113,113} %write{112,112} %derivs
+temp	color	$tmp82	%read{115,115} %write{114,114} %derivs
+temp	color	$tmp83	%read{118,118} %write{115,115} %derivs
+temp	float	$tmp84	%read{117,117} %write{116,116} %derivs
+temp	float	$tmp85	%read{118,118} %write{117,117} %derivs
+temp	float	$tmp86	%read{121,121} %write{119,119} %derivs
+temp	float	$tmp87	%read{121,121} %write{120,120} %derivs
+temp	float	$tmp88	%read{122,122} %write{121,121} %derivs
+temp	float	$tmp89	%read{125,125} %write{122,122} %derivs
+temp	float	$tmp90	%read{124,124} %write{123,123} %derivs
+temp	float	$tmp91	%read{125,125} %write{124,124} %derivs
+temp	float	$tmp92	%read{126,126} %write{125,125} %derivs
+temp	float	$tmp93	%read{132,132} %write{127,127} %derivs
+temp	float	$tmp94	%read{132,132} %write{131,131} %derivs
+temp	float	$tmp95	%read{130,130} %write{129,129} %derivs
+temp	float	$tmp96	%read{129,129} %write{128,128} %derivs
+temp	float	$tmp97	%read{131,131} %write{130,130} %derivs
+temp	color	$tmp98	%read{134,134} %write{133,133} %derivs
+temp	color	$tmp99	%read{138,138} %write{137,137} %derivs
+temp	float	$tmp100	%read{137,137} %write{135,135} %derivs
+temp	float	$tmp101	%read{137,137} %write{136,136} %derivs
+temp	color	$tmp102	%read{139,139} %write{138,138} %derivs
+temp	color	$tmp103	%read{141,141} %write{139,139} %derivs
+temp	float	$tmp104	%read{141,141} %write{140,140} %derivs
+temp	color	$tmp105	%read{144,144} %write{143,143} %derivs
+temp	float	$tmp106	%read{143,143} %write{142,142} %derivs
+temp	color	$tmp107	%read{145,145} %write{144,144} %derivs
+temp	color	$tmp108	%read{148,148} %write{145,145} %derivs
+temp	float	$tmp109	%read{147,147} %write{146,146} %derivs
+temp	float	$tmp110	%read{148,148} %write{147,147} %derivs
+temp	float	$tmp111	%read{151,151} %write{149,149} %derivs
+temp	float	$tmp112	%read{151,151} %write{150,150} %derivs
+temp	float	$tmp113	%read{152,152} %write{151,151} %derivs
+temp	float	$tmp114	%read{155,155} %write{152,152} %derivs
+temp	float	$tmp115	%read{154,154} %write{153,153} %derivs
+temp	float	$tmp116	%read{155,155} %write{154,154} %derivs
+temp	float	$tmp117	%read{156,156} %write{155,155} %derivs
+temp	float	$tmp118	%read{158,158} %write{157,157} %derivs
+temp	vector	$tmp119	%read{161,161} %write{158,158} %derivs
+temp	color	$tmp120	%read{160,160} %write{159,159} %derivs
+temp	color	$tmp121	%read{161,161} %write{160,160} %derivs
+temp	vector	$tmp122	%read{163,163} %write{161,161} %derivs
+temp	float	$tmp123	%read{163,163} %write{162,162} %derivs
+temp	vector	$tmp124	%read{164,164} %write{163,163} %derivs
+temp	vector	$tmp125	%read{168,168} %write{164,164} %derivs
+temp	color	$tmp126	%read{168,168} %write{167,167} %derivs
+temp	float	$tmp127	%read{167,167} %write{165,165} %derivs
+temp	float	$tmp128	%read{167,167} %write{166,166} %derivs
+temp	vector	$tmp129	%read{173,173} %write{168,168} %derivs
+temp	float	$tmp130	%read{172,172} %write{171,171} %derivs
+temp	float	$tmp131	%read{171,171} %write{169,169} %derivs
+temp	float	$tmp132	%read{171,171} %write{170,170} %derivs
+temp	float	$tmp133	%read{173,173} %write{172,172} %derivs
+temp	float	$tmp134	%read{183,183} %write{174,174} %derivs
+temp	float	$tmp135	%read{176,176} %write{175,175} %derivs
+temp	vector	$tmp136	%read{179,179} %write{176,176} %derivs
+temp	float	$tmp137	%read{178,178} %write{177,177} %derivs
+temp	color	$tmp138	%read{179,179} %write{178,178} %derivs
+temp	vector	$tmp139	%read{181,181} %write{179,179} %derivs
+temp	float	$tmp140	%read{181,181} %write{180,180} %derivs
+temp	vector	$tmp141	%read{182,182} %write{181,181} %derivs
+temp	vector	$tmp142	%read{183,183} %write{182,182} %derivs
+temp	float	$tmp143	%read{197,197} %write{190,190} %derivs
+temp	float	$tmp144	%read{185,185} %write{184,184} %derivs
+temp	float	$tmp145	%read{189,189} %write{185,185} %derivs
+temp	float	$tmp146	%read{187,187} %write{186,186} %derivs
+temp	float	$tmp147	%read{188,188} %write{187,187} %derivs
+temp	float	$tmp148	%read{189,189} %write{188,188} %derivs
+temp	float	$tmp149	%read{190,190} %write{189,189} %derivs
+temp	float	$tmp150	%read{197,197} %write{196,196} %derivs
+temp	float	$tmp151	%read{195,195} %write{191,191} %derivs
+temp	float	$tmp152	%read{194,194} %write{192,192} %derivs
+temp	float	$tmp153	%read{194,194} %write{193,193} %derivs
+temp	float	$tmp154	%read{195,195} %write{194,194} %derivs
+temp	float	$tmp155	%read{196,196} %write{195,195} %derivs
+temp	color	$tmp156	%read{199,199} %write{198,198} %derivs
+temp	color	$tmp157	%read{200,200} %write{199,199} %derivs
+temp	float	$tmp158	%read{202,202} %write{201,201} %derivs
+temp	float	$tmp159	%read{203,203} %write{202,202} %derivs
+temp	color	$tmp160	%read{207,207} %write{206,206} %derivs
+temp	float	$tmp161	%read{206,206} %write{204,204} %derivs
+temp	float	$tmp162	%read{206,206} %write{205,205} %derivs
+temp	float	$tmp163	%read{210,210} %write{208,208} %derivs
+temp	float	$tmp164	%read{210,210} %write{209,209} %derivs
+temp	float	$tmp165	%read{211,211} %write{210,210} %derivs
+temp	color	$tmp166	%read{213,213} %write{212,212} %derivs
+temp	color	$tmp167	%read{214,214} %write{213,213} %derivs
+temp	color	$tmp168	%read{215,215} %write{214,214} %derivs
+temp	int	$tmp169	%read{217,217} %write{216,216}
+temp	float	$tmp170	%read{220,220} %write{218,218} %derivs
+temp	float	$tmp171	%read{220,220} %write{219,219} %derivs
+temp	float	$tmp172	%read{221,221} %write{220,220} %derivs
+temp	float	$tmp173	%read{224,224} %write{222,222} %derivs
+temp	float	$tmp174	%read{224,224} %write{223,223} %derivs
+temp	float	$tmp175	%read{225,225} %write{224,224} %derivs
+temp	float	$tmp176	%read{227,227} %write{226,226} %derivs
+temp	float	$tmp177	%read{228,228} %write{227,227} %derivs
+temp	int	$tmp178	%read{230,230} %write{229,229}
+temp	float	$tmp179	%read{232,232} %write{231,231} %derivs
+temp	float	$tmp180	%read{233,233} %write{232,232} %derivs
+temp	float	$tmp181	%read{235,235} %write{234,234} %derivs
+temp	float	$tmp182	%read{237,237} %write{235,235} %derivs
+temp	float	$tmp183	%read{237,237} %write{236,236} %derivs
+temp	float	$tmp184	%read{238,238} %write{237,237} %derivs
+temp	float	$tmp185	%read{241,241} %write{239,239} %derivs
+temp	float	$tmp186	%read{241,241} %write{240,240} %derivs
+temp	float	$tmp187	%read{242,242} %write{241,241} %derivs
+temp	float	$tmp188	%read{245,245} %write{243,243} %derivs
+temp	float	$tmp189	%read{245,245} %write{244,244} %derivs
+temp	int	$tmp190	%read{247,247} %write{246,246}
+temp	float	$tmp191	%read{250,250} %write{248,248} %derivs
+temp	float	$tmp192	%read{250,250} %write{249,249} %derivs
+const	string	$const20	"alpha"		%read{250,257} %write{2147483647,-1}
+temp	int	$tmp193	%read{254,254} %write{253,253}
+temp	float	$tmp194	%read{257,257} %write{255,255} %derivs
+temp	float	$tmp195	%read{257,257} %write{256,256} %derivs
+code ___main___
+# jiWindowBox_Arnold.osl:20
+#     float roomDepthMult = clamp(roomDepth,0.1,100);
+	functioncall	$const4 3 	%filename{"jiWindowBox_Arnold.osl"} %line{20} %argrw{"r"}
+# /opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h:144
+# PERCOMP2 (fmod)
+	min		$tmp1 roomDepth $const3 	%filename{"/opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h"} %line{144} %argrw{"wrr"}
+	max		roomDepthMult $tmp1 $const1 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:21
+#     float heightOverscanMult = 1 - clamp(heightOverscan,0,0.9);
+	functioncall	$const4 6 	%filename{"jiWindowBox_Arnold.osl"} %line{21} %argrw{"r"}
+# /opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h:144
+# PERCOMP1 (trunc)
+	min		$tmp3 heightOverscan $const8 	%filename{"/opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h"} %line{144} %argrw{"wrr"}
+	max		$tmp2 $tmp3 $const7 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:21
+#     float heightOverscanMult = 1 - clamp(heightOverscan,0,0.9);
+	sub		heightOverscanMult $const9 $tmp2 	%filename{"jiWindowBox_Arnold.osl"} %line{21} %argrw{"wrr"}
+# jiWindowBox_Arnold.osl:22
+#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9); 
+	functioncall	$const4 10 	%line{22} %argrw{"r"}
+# /opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h:144
+# PERCOMP1 (round)
+	min		$tmp5 widthOverscan $const8 	%filename{"/opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h"} %line{144} %argrw{"wrr"}
+	max		$tmp4 $tmp5 $const7 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:22
+#     float widthOverscanMult = 1 - clamp(widthOverscan,0,0.9); 
+	sub		widthOverscanMult $const9 $tmp4 	%filename{"jiWindowBox_Arnold.osl"} %line{22} %argrw{"wrr"}
+# jiWindowBox_Arnold.osl:23
+#     float midgroundDepthMult = clamp(midgroundDepth,0.05,roomDepthMult-0.01); 
+	sub		$tmp6 roomDepthMult $const11 	%line{23} %argrw{"wrr"}
+	functioncall	$const4 15 	%argrw{"r"}
+# /opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h:144
+# PERCOMP1 (ceil)
+	min		$tmp7 midgroundDepth $tmp6 	%filename{"/opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h"} %line{144} %argrw{"wrr"}
+	max		midgroundDepthMult $tmp7 $const10 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:24
+#     float midgroundOffY = midgroundOffsetY * (textureFlip*2-1) * 0.1;
+	mul		$tmp8 textureFlip $const12 	%filename{"jiWindowBox_Arnold.osl"} %line{24} %argrw{"wrr"}
+	sub		$tmp9 $tmp8 $const5 	%argrw{"wrr"}
+	assign		$tmp11 $tmp9 	%argrw{"wr"}
+	mul		$tmp10 midgroundOffsetY $tmp11 	%argrw{"wrr"}
+	mul		midgroundOffY $tmp10 $const1 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:25
+#     float midgroundOffX = midgroundOffsetX * (textureFlop*2-1) * 0.1;
+	mul		$tmp12 textureFlop $const12 	%line{25} %argrw{"wrr"}
+	sub		$tmp13 $tmp12 $const5 	%argrw{"wrr"}
+	assign		$tmp15 $tmp13 	%argrw{"wr"}
+	mul		$tmp14 midgroundOffsetX $tmp15 	%argrw{"wrr"}
+	mul		midgroundOffX $tmp14 $const1 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:29
+#     vector objI = transform("object", -I);
+	neg		$tmp16 I 	%line{29} %argrw{"wr"}
+	functioncall	$const14 28 	%argrw{"r"}
+# /opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h:242
+#         F *= sqr (beta / (g+c));
+	transformv	objI $const15 $const13 $tmp16 	%filename{"/opt/pixar/RenderManProServer-21.3/lib/osl/include/stdosl.h"} %line{242} %argrw{"wrrr"}
+# jiWindowBox_Arnold.osl:30
+#     if (zUpAxis > 0){ 
+	gt		$tmp17 zUpAxis $const6 	%filename{"jiWindowBox_Arnold.osl"} %line{30} %argrw{"wrr"}
+	if		$tmp17 39 47 	%argrw{"r"}
+# jiWindowBox_Arnold.osl:31
+#       objI = vector(-objI[0],-objI[1],-objI[2]) * color(widthOverscanMult, heightOverscanMult, 1);		//reorder to match UV for Y up axis
+	compref		$tmp19 objI $const6 	%line{31} %argrw{"wrr"}
+	neg		$tmp20 $tmp19 	%argrw{"wr"}
+	compref		$tmp21 objI $const5 	%argrw{"wrr"}
+	neg		$tmp22 $tmp21 	%argrw{"wr"}
+	compref		$tmp23 objI $const12 	%argrw{"wrr"}
+	neg		$tmp24 $tmp23 	%argrw{"wr"}
+	vector		$tmp18 $tmp20 $tmp22 $tmp24 	%argrw{"wrrr"}
+	color		$tmp25 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp18 $tmp25 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:33
+#       objI = vector(-objI[0],objI[2],-objI[1]) * color(widthOverscanMult, heightOverscanMult, 1);		//reorder to match UV for Z up axis
+	compref		$tmp27 objI $const6 	%line{33} %argrw{"wrr"}
+	neg		$tmp28 $tmp27 	%argrw{"wr"}
+	compref		$tmp29 objI $const12 	%argrw{"wrr"}
+	compref		$tmp30 objI $const5 	%argrw{"wrr"}
+	neg		$tmp31 $tmp30 	%argrw{"wr"}
+	vector		$tmp26 $tmp28 $tmp29 $tmp31 	%argrw{"wrrr"}
+	color		$tmp32 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
+	mul		objI $tmp26 $tmp32 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:35
+#     color objPOrig = (color(u,v,0.5) * 2 - 1) * 0.5 + 0.5;							//for curtains
+	color		$tmp33 u v $const16 	%line{35} %argrw{"wrrr"}
+	mul		$tmp34 $tmp33 $const17 	%argrw{"wrr"}
+	sub		$tmp35 $tmp34 $const9 	%argrw{"wrr"}
+	mul		$tmp36 $tmp35 $const16 	%argrw{"wrr"}
+	add		objPOrig $tmp36 $const16 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:36
+#     color objP = (color(u,v,0.5) * 2 - 1) * color(widthOverscanMult, heightOverscanMult, 1)  * 0.5 + 0.5; 	//UV seems to be the better approach
+	color		$tmp37 u v $const16 	%line{36} %argrw{"wrrr"}
+	mul		$tmp38 $tmp37 $const17 	%argrw{"wrr"}
+	sub		$tmp39 $tmp38 $const9 	%argrw{"wrr"}
+	color		$tmp40 widthOverscanMult heightOverscanMult $const9 	%argrw{"wrrr"}
+	mul		$tmp41 $tmp39 $tmp40 	%argrw{"wrr"}
+	mul		$tmp42 $tmp41 $const16 	%argrw{"wrr"}
+	add		objP $tmp42 $const16 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:40
+#     vector sections = step(0, objI);
+	assign		$tmp43 $const7 	%line{40} %argrw{"wr"}
+	step		sections $tmp43 objI 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:41
+#     color baseDepth = (objP-sections)/(-objI * roomDepthMult);
+	sub		$tmp44 objP sections 	%line{41} %argrw{"wrr"}
+	neg		$tmp45 objI 	%argrw{"wr"}
+	mul		$tmp46 $tmp45 roomDepthMult 	%argrw{"wrr"}
+	div		baseDepth $tmp44 $tmp46 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:42
+#     color mgDepth = (objP-sections)/(-objI * midgroundDepthMult);    
+	sub		$tmp47 objP sections 	%line{42} %argrw{"wrr"}
+	neg		$tmp48 objI 	%argrw{"wr"}
+	mul		$tmp49 $tmp48 midgroundDepthMult 	%argrw{"wrr"}
+	div		mgDepth $tmp47 $tmp49 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:43
+#     color baseBack = (objP-sections)/(-objI);
+	sub		$tmp50 objP sections 	%line{43} %argrw{"wrr"}
+	neg		$tmp51 objI 	%argrw{"wr"}
+	div		baseBack $tmp50 $tmp51 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:44
+#     color baseWidth = baseDepth * roomDepthMult;
+	mul		baseWidth baseDepth roomDepthMult 	%line{44} %argrw{"wrr"}
+# jiWindowBox_Arnold.osl:49
+#     color baseDepthX = (baseDepth[1]*objI+objP + 1);
+	compref		$tmp52 baseDepth $const5 	%line{49} %argrw{"wrr"}
+	mul		$tmp53 $tmp52 objI 	%argrw{"wrr"}
+	add		$tmp54 $tmp53 objP 	%argrw{"wrr"}
+	add		baseDepthX $tmp54 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:50
+#     color baseDepthY = (baseDepth[0]*objI+objP + 1);
+	compref		$tmp55 baseDepth $const6 	%line{50} %argrw{"wrr"}
+	mul		$tmp56 $tmp55 objI 	%argrw{"wrr"}
+	add		$tmp57 $tmp56 objP 	%argrw{"wrr"}
+	add		baseDepthY $tmp57 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:51
+#     color baseWidthX = (baseWidth[1]*objI+objP + 1);
+	compref		$tmp58 baseWidth $const5 	%line{51} %argrw{"wrr"}
+	mul		$tmp59 $tmp58 objI 	%argrw{"wrr"}
+	add		$tmp60 $tmp59 objP 	%argrw{"wrr"}
+	add		baseWidthX $tmp60 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:52
+#     color baseWidthY = (baseWidth[0]*objI+objP + 1);
+	compref		$tmp61 baseWidth $const6 	%line{52} %argrw{"wrr"}
+	mul		$tmp62 $tmp61 objI 	%argrw{"wrr"}
+	add		$tmp63 $tmp62 objP 	%argrw{"wrr"}
+	add		baseWidthY $tmp63 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:54
+#     float horizU = baseDepthY[2] - 0.5;
+	compref		$tmp64 baseDepthY $const12 	%line{54} %argrw{"wrr"}
+	sub		horizU $tmp64 $const16 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:55
+#     float vertU = baseWidthX[0] - 1;
+	compref		$tmp65 baseWidthX $const6 	%line{55} %argrw{"wrr"}
+	sub		vertU $tmp65 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:56
+#     float horizV = baseWidthY[1] - 1;
+	compref		$tmp66 baseWidthY $const5 	%line{56} %argrw{"wrr"}
+	sub		horizV $tmp66 $const9 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:57
+#     float vertV = baseDepthX[2] - 0.5;
+	compref		$tmp67 baseDepthX $const12 	%line{57} %argrw{"wrr"}
+	sub		vertV $tmp67 $const16 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:61
+#     float sideWallsMask = step(0,horizU) * step(0,1-max(horizV, 1-horizV)); 
+	step		$tmp68 $const7 horizU 	%line{61} %argrw{"wrr"}
+	sub		$tmp71 $const9 horizV 	%argrw{"wrr"}
+	max		$tmp70 horizV $tmp71 	%argrw{"wrr"}
+	sub		$tmp72 $const9 $tmp70 	%argrw{"wrr"}
+	step		$tmp69 $const7 $tmp72 	%argrw{"wrr"}
+	mul		sideWallsMask $tmp68 $tmp69 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:62
+#     color sideWallsUV = color(horizU, horizV, 0) / 3;
+	color		$tmp73 horizU horizV $const7 	%line{62} %argrw{"wrrr"}
+	div		sideWallsUV $tmp73 $const19 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:63
+#     color rWallUV = (sideWallsUV + color(2.0/3.0, 1.0/3.0, 0)) * sideWallsMask * sections[0];
+	div		$tmp75 $const17 $const19 	%line{63} %argrw{"wrr"}
+	div		$tmp76 $const9 $const19 	%argrw{"wrr"}
+	color		$tmp74 $tmp75 $tmp76 $const7 	%argrw{"wrrr"}
+	add		$tmp77 sideWallsUV $tmp74 	%argrw{"wrr"}
+	mul		$tmp78 $tmp77 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp79 sections $const6 	%argrw{"wrr"}
+	mul		rWallUV $tmp78 $tmp79 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:64
+#     color lWallUV = (sideWallsUV + color(0.0, 1.0/3.0, 0)) * sideWallsMask * (1-sections[0]);
+	div		$tmp81 $const9 $const19 	%line{64} %argrw{"wrr"}
+	color		$tmp80 $const7 $tmp81 $const7 	%argrw{"wrrr"}
+	add		$tmp82 sideWallsUV $tmp80 	%argrw{"wrr"}
+	mul		$tmp83 $tmp82 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp84 sections $const6 	%argrw{"wrr"}
+	sub		$tmp85 $const9 $tmp84 	%argrw{"wrr"}
+	mul		lWallUV $tmp83 $tmp85 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:65
+#     lWallUV[0] = (1.0/3.0 - lWallUV[0]) * sideWallsMask * (1-sections[0]);     
+	div		$tmp86 $const9 $const19 	%line{65} %argrw{"wrr"}
+	compref		$tmp87 lWallUV $const6 	%argrw{"wrr"}
+	sub		$tmp88 $tmp86 $tmp87 	%argrw{"wrr"}
+	mul		$tmp89 $tmp88 sideWallsMask 	%argrw{"wrr"}
+	compref		$tmp90 sections $const6 	%argrw{"wrr"}
+	sub		$tmp91 $const9 $tmp90 	%argrw{"wrr"}
+	mul		$tmp92 $tmp89 $tmp91 	%argrw{"wrr"}
+	compassign	lWallUV $const6 $tmp92 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:67
+#     float FloorCeilMask = step(0,vertV) * step(0,1-max(vertU, 1-vertU));
+	step		$tmp93 $const7 vertV 	%line{67} %argrw{"wrr"}
+	sub		$tmp96 $const9 vertU 	%argrw{"wrr"}
+	max		$tmp95 vertU $tmp96 	%argrw{"wrr"}
+	sub		$tmp97 $const9 $tmp95 	%argrw{"wrr"}
+	step		$tmp94 $const7 $tmp97 	%argrw{"wrr"}
+	mul		FloorCeilMask $tmp93 $tmp94 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:68
+#     color FloorCeilUV = color(vertU, vertV, 0) / 3;
+	color		$tmp98 vertU vertV $const7 	%line{68} %argrw{"wrrr"}
+	div		FloorCeilUV $tmp98 $const19 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:69
+#     color ceilUV = (FloorCeilUV + color(1.0/3.0, 2.0/3.0, 0)) * FloorCeilMask * sections[1];
+	div		$tmp100 $const9 $const19 	%line{69} %argrw{"wrr"}
+	div		$tmp101 $const17 $const19 	%argrw{"wrr"}
+	color		$tmp99 $tmp100 $tmp101 $const7 	%argrw{"wrrr"}
+	add		$tmp102 FloorCeilUV $tmp99 	%argrw{"wrr"}
+	mul		$tmp103 $tmp102 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp104 sections $const5 	%argrw{"wrr"}
+	mul		ceilUV $tmp103 $tmp104 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:70
+#     color floorUV = (FloorCeilUV + color(1.0/3.0, 0, 0)) * FloorCeilMask * (1-sections[1]);
+	div		$tmp106 $const9 $const19 	%line{70} %argrw{"wrr"}
+	color		$tmp105 $tmp106 $const7 $const7 	%argrw{"wrrr"}
+	add		$tmp107 FloorCeilUV $tmp105 	%argrw{"wrr"}
+	mul		$tmp108 $tmp107 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp109 sections $const5 	%argrw{"wrr"}
+	sub		$tmp110 $const9 $tmp109 	%argrw{"wrr"}
+	mul		floorUV $tmp108 $tmp110 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:71
+#     floorUV[1] = (1.0/3.0 - floorUV[1]) * FloorCeilMask * (1-sections[1]);
+	div		$tmp111 $const9 $const19 	%line{71} %argrw{"wrr"}
+	compref		$tmp112 floorUV $const5 	%argrw{"wrr"}
+	sub		$tmp113 $tmp111 $tmp112 	%argrw{"wrr"}
+	mul		$tmp114 $tmp113 FloorCeilMask 	%argrw{"wrr"}
+	compref		$tmp115 sections $const5 	%argrw{"wrr"}
+	sub		$tmp116 $const9 $tmp115 	%argrw{"wrr"}
+	mul		$tmp117 $tmp114 $tmp116 	%argrw{"wrr"}
+	compassign	floorUV $const5 $tmp117 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:73
+#     color backWallUV = ((baseBack[2]*objI + (objP/2)/(roomDepthMult)) * (roomDepthMult*2) / 3 + color(1.0/3.0, 1.0/3.0, 0) ) * (1 - max(step(0,horizU), step(0,vertV)));
+	compref		$tmp118 baseBack $const12 	%line{73} %argrw{"wrr"}
+	mul		$tmp119 $tmp118 objI 	%argrw{"wrr"}
+	div		$tmp120 objP $const17 	%argrw{"wrr"}
+	div		$tmp121 $tmp120 roomDepthMult 	%argrw{"wrr"}
+	add		$tmp122 $tmp119 $tmp121 	%argrw{"wrr"}
+	mul		$tmp123 roomDepthMult $const17 	%argrw{"wrr"}
+	mul		$tmp124 $tmp122 $tmp123 	%argrw{"wrr"}
+	div		$tmp125 $tmp124 $const19 	%argrw{"wrr"}
+	div		$tmp127 $const9 $const19 	%argrw{"wrr"}
+	div		$tmp128 $const9 $const19 	%argrw{"wrr"}
+	color		$tmp126 $tmp127 $tmp128 $const7 	%argrw{"wrrr"}
+	add		$tmp129 $tmp125 $tmp126 	%argrw{"wrr"}
+	step		$tmp131 $const7 horizU 	%argrw{"wrr"}
+	step		$tmp132 $const7 vertV 	%argrw{"wrr"}
+	max		$tmp130 $tmp131 $tmp132 	%argrw{"wrr"}
+	sub		$tmp133 $const9 $tmp130 	%argrw{"wrr"}
+	mul		backWallUV $tmp129 $tmp133 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:76
+#     color midgroundUV = (1.0/3.0 - (baseBack[2]*objI + (objP)/(midgroundDepthMult*2)) * (midgroundDepthMult*2) / 3);
+	div		$tmp134 $const9 $const19 	%line{76} %argrw{"wrr"}
+	compref		$tmp135 baseBack $const12 	%argrw{"wrr"}
+	mul		$tmp136 $tmp135 objI 	%argrw{"wrr"}
+	mul		$tmp137 midgroundDepthMult $const17 	%argrw{"wrr"}
+	div		$tmp138 objP $tmp137 	%argrw{"wrr"}
+	add		$tmp139 $tmp136 $tmp138 	%argrw{"wrr"}
+	mul		$tmp140 midgroundDepthMult $const17 	%argrw{"wrr"}
+	mul		$tmp141 $tmp139 $tmp140 	%argrw{"wrr"}
+	div		$tmp142 $tmp141 $const19 	%argrw{"wrr"}
+	sub		midgroundUV $tmp134 $tmp142 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:77
+#     float midgroundMask = step( 0, midgroundUV[1] * 3 * (1-midgroundUV[1]*3) ) * step( 0, midgroundUV[0] * (1.0/3.0-midgroundUV[0]) ); 
+	compref		$tmp144 midgroundUV $const5 	%line{77} %argrw{"wrr"}
+	mul		$tmp145 $tmp144 $const19 	%argrw{"wrr"}
+	compref		$tmp146 midgroundUV $const5 	%argrw{"wrr"}
+	mul		$tmp147 $tmp146 $const19 	%argrw{"wrr"}
+	sub		$tmp148 $const9 $tmp147 	%argrw{"wrr"}
+	mul		$tmp149 $tmp145 $tmp148 	%argrw{"wrr"}
+	step		$tmp143 $const7 $tmp149 	%argrw{"wrr"}
+	compref		$tmp151 midgroundUV $const6 	%argrw{"wrr"}
+	div		$tmp152 $const9 $const19 	%argrw{"wrr"}
+	compref		$tmp153 midgroundUV $const6 	%argrw{"wrr"}
+	sub		$tmp154 $tmp152 $tmp153 	%argrw{"wrr"}
+	mul		$tmp155 $tmp151 $tmp154 	%argrw{"wrr"}
+	step		$tmp150 $const7 $tmp155 	%argrw{"wrr"}
+	mul		midgroundMask $tmp143 $tmp150 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:78
+#     midgroundUV = (color(midgroundOffX, midgroundOffY, 0) + midgroundUV) * midgroundMask;
+	color		$tmp156 midgroundOffX midgroundOffY $const7 	%line{78} %argrw{"wrrr"}
+	add		$tmp157 $tmp156 midgroundUV 	%argrw{"wrr"}
+	mul		midgroundUV $tmp157 midgroundMask 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:79
+#     midgroundUV[1] = 1-midgroundUV[1];  
+	compref		$tmp158 midgroundUV $const5 	%line{79} %argrw{"wrr"}
+	sub		$tmp159 $const9 $tmp158 	%argrw{"wrr"}
+	compassign	midgroundUV $const5 $tmp159 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:81
+#     color curtainsUV = objPOrig * color(1.0/3.0, 1.0/3.0, 1);
+	div		$tmp161 $const9 $const19 	%line{81} %argrw{"wrr"}
+	div		$tmp162 $const9 $const19 	%argrw{"wrr"}
+	color		$tmp160 $tmp161 $tmp162 $const9 	%argrw{"wrrr"}
+	mul		curtainsUV objPOrig $tmp160 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:82
+#     curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
+	div		$tmp163 $const9 $const19 	%line{82} %argrw{"wrr"}
+	compref		$tmp164 curtainsUV $const6 	%argrw{"wrr"}
+	sub		$tmp165 $tmp163 $tmp164 	%argrw{"wrr"}
+	compassign	curtainsUV $const6 $tmp165 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:86
+#     color finalUV = ceilUV + floorUV + rWallUV + lWallUV + backWallUV;
+	add		$tmp166 ceilUV floorUV 	%line{86} %argrw{"wrr"}
+	add		$tmp167 $tmp166 rWallUV 	%argrw{"wrr"}
+	add		$tmp168 $tmp167 lWallUV 	%argrw{"wrr"}
+	add		finalUV $tmp168 backWallUV 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:92
+#     if (textureFlop > 0){
+	gt		$tmp169 textureFlop $const6 	%line{92} %argrw{"wrr"}
+	if		$tmp169 226 229 	%argrw{"r"}
+# jiWindowBox_Arnold.osl:93
+#         midgroundUV[0] = 1.0/3.0 - midgroundUV[0];
+	div		$tmp170 $const9 $const19 	%line{93} %argrw{"wrr"}
+	compref		$tmp171 midgroundUV $const6 	%argrw{"wrr"}
+	sub		$tmp172 $tmp170 $tmp171 	%argrw{"wrr"}
+	compassign	midgroundUV $const6 $tmp172 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:94
+#         curtainsUV[0] = 1.0/3.0 - curtainsUV[0];
+	div		$tmp173 $const9 $const19 	%line{94} %argrw{"wrr"}
+	compref		$tmp174 curtainsUV $const6 	%argrw{"wrr"}
+	sub		$tmp175 $tmp173 $tmp174 	%argrw{"wrr"}
+	compassign	curtainsUV $const6 $tmp175 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:96
+#         finalUV[0] = 1-finalUV[0];
+	compref		$tmp176 finalUV $const6 	%line{96} %argrw{"wrr"}
+	sub		$tmp177 $const9 $tmp176 	%argrw{"wrr"}
+	compassign	finalUV $const6 $tmp177 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:97
+#     if (textureFlip > 0){
+	gt		$tmp178 textureFlip $const6 	%line{97} %argrw{"wrr"}
+	if		$tmp178 243 243 	%argrw{"r"}
+# jiWindowBox_Arnold.osl:98
+#         finalUV[1] = 1-finalUV[1];
+	compref		$tmp179 finalUV $const5 	%line{98} %argrw{"wrr"}
+	sub		$tmp180 $const9 $tmp179 	%argrw{"wrr"}
+	compassign	finalUV $const5 $tmp180 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:99
+#         midgroundUV[1] = 1 - midgroundUV[1] + 2.0/3.0;
+	compref		$tmp181 midgroundUV $const5 	%line{99} %argrw{"wrr"}
+	sub		$tmp182 $const9 $tmp181 	%argrw{"wrr"}
+	div		$tmp183 $const17 $const19 	%argrw{"wrr"}
+	add		$tmp184 $tmp182 $tmp183 	%argrw{"wrr"}
+	compassign	midgroundUV $const5 $tmp184 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:100
+#         curtainsUV[1] = 1.0/3.0 - curtainsUV[1];
+	div		$tmp185 $const9 $const19 	%line{100} %argrw{"wrr"}
+	compref		$tmp186 curtainsUV $const5 	%argrw{"wrr"}
+	sub		$tmp187 $tmp185 $tmp186 	%argrw{"wrr"}
+	compassign	curtainsUV $const5 $tmp187 	%argrw{"wrr"}
+# jiWindowBox_Arnold.osl:104
+#     color roomRGB = texture(filename, finalUV[0], finalUV[1]);
+	compref		$tmp188 finalUV $const6 	%line{104} %argrw{"wrr"}
+	compref		$tmp189 finalUV $const5 	%argrw{"wrr"}
+	texture		roomRGB filename $tmp188 $tmp189 	%argrw{"wrrr"} %argderivs{2,3}
+# jiWindowBox_Arnold.osl:112
+#     if (enableMidground > 0){
+	gt		$tmp190 enableMidground $const6 	%line{112} %argrw{"wrr"}
+	if		$tmp190 252 253 	%argrw{"r"}
+# jiWindowBox_Arnold.osl:114
+#         color midgroundRGB = texture(filename, midgroundUV[0], midgroundUV[1], "alpha", midgroundA);
+	compref		$tmp191 midgroundUV $const6 	%line{114} %argrw{"wrr"}
+	compref		$tmp192 midgroundUV $const5 	%argrw{"wrr"}
+	texture		___309_midgroundRGB filename $tmp191 $tmp192 $const20 ___309_midgroundA 	%argrw{"wrrrrw"} %argderivs{2,3}
+# jiWindowBox_Arnold.osl:115
+#         finalRGB = mix(roomRGB,midgroundRGB,midgroundA);
+	mix		finalRGB roomRGB ___309_midgroundRGB ___309_midgroundA 	%line{115} %argrw{"wrrr"}
+# jiWindowBox_Arnold.osl:118
+#         finalRGB = roomRGB;
+	assign		finalRGB roomRGB 	%line{118} %argrw{"wr"}
+# jiWindowBox_Arnold.osl:125
+#     if (enableCurtains > 0){
+	gt		$tmp193 enableCurtains $const6 	%line{125} %argrw{"wrr"}
+	if		$tmp193 259 259 	%argrw{"r"}
+# jiWindowBox_Arnold.osl:127
+#         color curtainsRGB = texture(filename, curtainsUV[0], curtainsUV[1], "alpha", curtainsA);
+	compref		$tmp194 curtainsUV $const6 	%line{127} %argrw{"wrr"}
+	compref		$tmp195 curtainsUV $const5 	%argrw{"wrr"}
+	texture		___311_curtainsRGB filename $tmp194 $tmp195 $const20 ___311_curtainsA 	%argrw{"wrrrrw"} %argderivs{2,3}
+# jiWindowBox_Arnold.osl:128
+#         finalRGB = mix(finalRGB,curtainsRGB,curtainsA);
+	mix		finalRGB finalRGB ___311_curtainsRGB ___311_curtainsA 	%line{128} %argrw{"wrrr"}
+# jiWindowBox_Arnold.osl:134
+#     outRGB = finalRGB;
+	assign		outRGB finalRGB 	%line{134} %argrw{"wr"}
+	end
