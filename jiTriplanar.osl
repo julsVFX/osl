@@ -1,0 +1,86 @@
+#include <stdosl.h>
+
+shader jiTriplanar(
+    string filename = ""
+    [[ string widget = "filename" ]],
+    string mapping = "world"
+    [[ string widget = "popup",
+            string options = "world|object" ]],
+    color input = color(0),
+    vector rotation = vector(0.0,0.0,0.0),
+    float xtile = 1.0,
+    float xmin = 0.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    float xmax = 1.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    float ytile = 1.0,
+    float ymin = 0.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    float ymax = 1.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    float ztile = 1.0,
+    float zmin = 0.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    float zmax = 1.0
+    [[ float min = 0.0,
+        float max = 1.0 ]],
+    int use_breakup = 0
+    [[ string widget = "checkBox" ]],
+    float breakup_input = 0.0,
+    float breakup_exponent = 1.0,
+    output color outRGB = color(0),
+    output float outA = 0.0,
+    output color outAreaMask = 0.0,
+)
+
+{
+    point PP = transform(mapping, P);
+    vector NN = normalize(transform(mapping, N));
+
+
+    //set up rotations (the dumb way without matrices)
+    color pRotX = rotate(PP, (rotation[0]/57.2958), point(0.0,0.0,0.0), point(1.0,0.0,0.0));
+    color pRotXY = rotate(pRotX, (rotation[1]/57.2958), point(0.0,0.0,0.0), point(0.0,1.0,0.0));
+    color pRotXYZ = rotate(pRotXY, (rotation[2]/57.2958), point(0.0,0.0,0.0), point(0.0,0.0,1.0));
+    
+    color nRotX = rotate(NN, (rotation[0]/57.2958), point(0.0,0.0,0.0), point(1.0,0.0,0.0));
+    color nRotXY = rotate(nRotX, (rotation[1]/57.2958), point(0.0,0.0,0.0), point(0.0,1.0,0.0));
+    color nRotXYZ = rotate(nRotXY, (rotation[2]/57.2958), point(0.0,0.0,0.0), point(0.0,0.0,1.0));
+
+
+    //create Normal-masks with min/max values
+    float nNx = clamp((1-clamp((1-abs(nRotXYZ[0])) * (1/(1-xmin)),0,1)) * 1/xmax,0,1);
+    float nNy = clamp((1-clamp((1-abs(nRotXYZ[1])) * (1/(1-ymin)),0,1)) * 1/ymax,0,1);
+    float nNz = clamp((1-clamp((1-abs(nRotXYZ[2])) * (1/(1-zmin)),0,1)) * 1/zmax,0,1);
+
+    float Nx, Ny, Nz;
+    
+
+    //Use breakup ("softlight" blend-mode)
+    if ( use_breakup == 0 ){
+        Nx = nNx;
+        Ny = nNy;
+        Nz = nNz;
+    } else {
+        float breakup = clamp(breakup_input,0,1);
+        Nx = clamp(pow(nNx*(2*breakup+(nNx*(1-breakup*nNx))), breakup_exponent),0,1);
+        Ny = clamp(pow(nNy*(2*breakup+(nNy*(1-breakup*nNy))), breakup_exponent),0,1);
+        Nz = clamp(pow(nNz*(2*breakup+(nNz*(1-breakup*nNz))), breakup_exponent),0,1);
+    }
+    
+
+    
+    //layering (X over Y over Z)
+    outRGB = mix(mix(mix(input,(color) texture(filename, pRotXYZ[0]*ztile, pRotXYZ[1]*ztile, "wrap", "periodic"),Nz), (color) texture(filename, pRotXYZ[0]*ytile, pRotXYZ[2]*ytile, "wrap", "periodic"), Ny), (color) texture(filename, pRotXYZ[1]*xtile, pRotXYZ[2]*xtile, "wrap", "periodic"), Nx);
+    
+    //combine output alpha ("screen" blendmode)
+    outA = clamp((Nx+Ny+Nz)-(Nx*Ny*Nz),0,1); 
+    
+    outAreaMask = mix(mix(mix(input,color(0,0,1),Nz), color(0,1,0),Ny), color(1,0,0),Nx);
+    
+}

@@ -1,0 +1,37 @@
+#include <stdosl.h>
+
+/*
+ Simple bubbles shader for shaders.xyz beer foam challenge.
+ 
+ Author: Julius Ihle
+ Version: 1.0
+*/
+
+
+shader jiBubbles(
+		color Position = 0,
+                point offset = 0,
+                int seed = 0,
+                int maxNum = 10,
+                float minSize = 0.5,
+                float maxSize = 1.5,
+                float gamma = 1,
+                point spread = 1,
+                output color outRGB = 0
+)
+
+{
+    //point Pos = transform("world",P) - offset;
+    color Pos = Position - offset;
+  
+    float bubbles = 0;
+    
+    for (float i = 0.0; i < maxNum ; ++i) {
+        color randPos = cellnoise(i,seed) * spread - (spread/2);
+        float randSize = minSize + cellnoise(i,seed+847) * (maxSize - minSize) / 1;
+        bubbles = max( bubbles, 1-( pow( clamp(distance(randPos,Pos/randSize),0,1), gamma)) );         
+        outRGB = bubbles;           
+    }
+    
+
+}

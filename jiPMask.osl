@@ -1,0 +1,40 @@
+#include <stdosl.h>
+
+shader jiPMask(
+    string Mapping = "PWorld"
+    	[[ string widget = "popup",
+    		string options = "PWorld|PRef" ]],
+    color Pos = color(0.0),
+    color Radius = color(1.0),
+    float whitepoint = 1.0
+    	[[ float min = 0, float max = 1 ]],
+    float blackpoint = 0.0
+    	[[ float min = 0, float max = 1 ]],
+    float gamma = 1.0,
+    output float Mask = 0.0,
+	output color PRef = color(0.0),
+	output color PWorld = color(0.0)
+)
+
+{
+ 	//Pworld & Pref
+ 	point PosRef = transform("object", P);
+   	point PosWorld = transform("world", P);
+   	PRef = PosRef;
+   	PWorld = PosWorld;
+
+   	color Position; //Declaring the position variable that will eventually be used
+  	if (Mapping == "PRef")
+  		Position = PosRef;
+    else
+        Position = PosWorld;
+
+    float XPos = (Position[0]-Pos[0])/(Radius[0]+0.0001);
+   	float YPos = (Position[1]-Pos[1])/(Radius[1]+0.0001);
+   	float ZPos = (Position[2]-Pos[2])/(Radius[2]+0.0001);
+
+   	float mult = 1/whitepoint;
+   	float invMult = pow(1/sqrt(1-blackpoint),2);
+
+	Mask = pow(clamp(mult*(1-(invMult*(sqrt(pow(XPos,2)+pow(YPos,2)+pow(ZPos,2))))),0,1),1/gamma);
+}

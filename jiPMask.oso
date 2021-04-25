@@ -1,0 +1,149 @@
+OpenShadingLanguage 1.00
+# Compiled by oslc 1.11.6
+# options: 
+shader jiPMask
+param	string	Mapping	"PWorld"		%meta{string,widget,"popup"} %meta{string,options,"PWorld|PRef"}  %read{6,6} %write{2147483647,-1}
+param	color	Pos	0 0 0		%read{11,23} %write{2147483647,-1}
+param	color	Radius	1 1 1		%read{13,25} %write{2147483647,-1}
+param	float	whitepoint	1		%meta{float,min,0} %meta{float,max,1}  %read{28,28} %write{2147483647,-1}
+param	float	blackpoint	0		%meta{float,min,0} %meta{float,max,1}  %read{29,29} %write{2147483647,-1}
+param	float	gamma	1		%read{45,45} %write{2147483647,-1}
+oparam	float	Mask	0		%read{2147483647,-1} %write{46,46}
+oparam	color	PRef	0 0 0		%read{2147483647,-1} %write{4,4}
+oparam	color	PWorld	0 0 0		%read{2147483647,-1} %write{5,5}
+global	point	P	%read{1,3} %write{2147483647,-1}
+local	point	PosRef	%read{4,8} %write{1,1}
+local	point	PosWorld	%read{5,9} %write{3,3}
+local	color	Position	%read{10,22} %write{8,9}
+local	float	XPos	%read{33,33} %write{15,15}
+local	float	YPos	%read{34,34} %write{21,21}
+local	float	ZPos	%read{36,36} %write{27,27}
+local	float	mult	%read{41,41} %write{28,28}
+local	float	invMult	%read{39,39} %write{32,32}
+const	string	$const1	"object"		%read{1,1} %write{2147483647,-1}
+const	string	$const2	"transform"		%read{0,2} %write{2147483647,-1}
+const	string	$const3	"common"		%read{1,3} %write{2147483647,-1}
+const	string	$const4	"world"		%read{3,3} %write{2147483647,-1}
+const	string	$const5	"PRef"		%read{6,6} %write{2147483647,-1}
+temp	int	$tmp1	%read{7,7} %write{6,6}
+const	int	$const6	0		%read{10,13} %write{2147483647,-1}
+temp	float	$tmp2	%read{12,12} %write{10,10}
+temp	float	$tmp3	%read{12,12} %write{11,11}
+temp	float	$tmp4	%read{15,15} %write{12,12}
+temp	float	$tmp5	%read{14,14} %write{13,13}
+const	float	$const7	9.99999975e-05		%read{14,26} %write{2147483647,-1}
+temp	float	$tmp6	%read{15,15} %write{14,14}
+const	int	$const8	1		%read{16,19} %write{2147483647,-1}
+temp	float	$tmp7	%read{18,18} %write{16,16}
+temp	float	$tmp8	%read{18,18} %write{17,17}
+temp	float	$tmp9	%read{21,21} %write{18,18}
+temp	float	$tmp10	%read{20,20} %write{19,19}
+temp	float	$tmp11	%read{21,21} %write{20,20}
+const	int	$const9	2		%read{22,25} %write{2147483647,-1}
+temp	float	$tmp12	%read{24,24} %write{22,22}
+temp	float	$tmp13	%read{24,24} %write{23,23}
+temp	float	$tmp14	%read{27,27} %write{24,24}
+temp	float	$tmp15	%read{26,26} %write{25,25}
+temp	float	$tmp16	%read{27,27} %write{26,26}
+const	float	$const10	1		%read{28,45} %write{2147483647,-1}
+temp	float	$tmp17	%read{31,31} %write{30,30}
+temp	float	$tmp18	%read{30,30} %write{29,29}
+temp	float	$tmp19	%read{32,32} %write{31,31}
+const	float	$const11	2		%read{32,36} %write{2147483647,-1}
+temp	float	$tmp20	%read{46,46} %write{44,44}
+temp	float	$tmp21	%read{39,39} %write{38,38}
+temp	float	$tmp22	%read{35,35} %write{33,33}
+temp	float	$tmp23	%read{35,35} %write{34,34}
+temp	float	$tmp24	%read{37,37} %write{35,35}
+temp	float	$tmp25	%read{37,37} %write{36,36}
+temp	float	$tmp26	%read{38,38} %write{37,37}
+temp	float	$tmp27	%read{40,40} %write{39,39}
+temp	float	$tmp28	%read{41,41} %write{40,40}
+temp	float	$tmp29	%read{43,43} %write{41,41}
+const	float	$const12	0		%read{44,44} %write{2147483647,-1}
+const	string	$const13	"clamp"		%read{42,42} %write{2147483647,-1}
+temp	float	$tmp30	%read{44,44} %write{43,43}
+temp	float	$tmp31	%read{46,46} %write{45,45}
+code ___main___
+# jiPMask.osl:21
+#  	point PosRef = transform("object", P);
+	functioncall	$const2 2 	%filename{"jiPMask.osl"} %line{21} %argrw{"r"}
+# /opt/solidangle/mtoa/2019/osl/include/stdosl.h:263
+# point  transform (string to, point p)  { return transform("common",to,p); }
+	transform	PosRef $const3 $const1 P 	%filename{"/opt/solidangle/mtoa/2019/osl/include/stdosl.h"} %line{263} %argrw{"wrrr"}
+# jiPMask.osl:22
+#    	point PosWorld = transform("world", P);
+	functioncall	$const2 4 	%filename{"jiPMask.osl"} %line{22} %argrw{"r"}
+# /opt/solidangle/mtoa/2019/osl/include/stdosl.h:263
+# point  transform (string to, point p)  { return transform("common",to,p); }
+	transform	PosWorld $const3 $const4 P 	%filename{"/opt/solidangle/mtoa/2019/osl/include/stdosl.h"} %line{263} %argrw{"wrrr"}
+# jiPMask.osl:23
+#    	PRef = PosRef;
+	assign		PRef PosRef 	%filename{"jiPMask.osl"} %line{23} %argrw{"wr"}
+# jiPMask.osl:24
+#    	PWorld = PosWorld;
+	assign		PWorld PosWorld 	%line{24} %argrw{"wr"}
+# jiPMask.osl:27
+#   	if (Mapping == "PRef")
+	eq		$tmp1 Mapping $const5 	%line{27} %argrw{"wrr"}
+	if		$tmp1 9 10 	%argrw{"r"}
+# jiPMask.osl:28
+#   		Position = PosRef;
+	assign		Position PosRef 	%line{28} %argrw{"wr"}
+# jiPMask.osl:30
+#         Position = PosWorld;
+	assign		Position PosWorld 	%line{30} %argrw{"wr"}
+# jiPMask.osl:32
+#     float XPos = (Position[0]-Pos[0])/(Radius[0]+0.0001);
+	compref		$tmp2 Position $const6 	%line{32} %argrw{"wrr"}
+	compref		$tmp3 Pos $const6 	%argrw{"wrr"}
+	sub		$tmp4 $tmp2 $tmp3 	%argrw{"wrr"}
+	compref		$tmp5 Radius $const6 	%argrw{"wrr"}
+	add		$tmp6 $tmp5 $const7 	%argrw{"wrr"}
+	div		XPos $tmp4 $tmp6 	%argrw{"wrr"}
+# jiPMask.osl:33
+#    	float YPos = (Position[1]-Pos[1])/(Radius[1]+0.0001);
+	compref		$tmp7 Position $const8 	%line{33} %argrw{"wrr"}
+	compref		$tmp8 Pos $const8 	%argrw{"wrr"}
+	sub		$tmp9 $tmp7 $tmp8 	%argrw{"wrr"}
+	compref		$tmp10 Radius $const8 	%argrw{"wrr"}
+	add		$tmp11 $tmp10 $const7 	%argrw{"wrr"}
+	div		YPos $tmp9 $tmp11 	%argrw{"wrr"}
+# jiPMask.osl:34
+#    	float ZPos = (Position[2]-Pos[2])/(Radius[2]+0.0001);
+	compref		$tmp12 Position $const9 	%line{34} %argrw{"wrr"}
+	compref		$tmp13 Pos $const9 	%argrw{"wrr"}
+	sub		$tmp14 $tmp12 $tmp13 	%argrw{"wrr"}
+	compref		$tmp15 Radius $const9 	%argrw{"wrr"}
+	add		$tmp16 $tmp15 $const7 	%argrw{"wrr"}
+	div		ZPos $tmp14 $tmp16 	%argrw{"wrr"}
+# jiPMask.osl:36
+#    	float mult = 1/whitepoint;
+	div		mult $const10 whitepoint 	%line{36} %argrw{"wrr"}
+# jiPMask.osl:37
+#    	float invMult = pow(1/sqrt(1-blackpoint),2);
+	sub		$tmp18 $const10 blackpoint 	%line{37} %argrw{"wrr"}
+	sqrt		$tmp17 $tmp18 	%argrw{"wr"}
+	div		$tmp19 $const10 $tmp17 	%argrw{"wrr"}
+	pow		invMult $tmp19 $const11 	%argrw{"wrr"}
+# jiPMask.osl:39
+# 	Mask = pow(clamp(mult*(1-(invMult*(sqrt(pow(XPos,2)+pow(YPos,2)+pow(ZPos,2))))),0,1),1/gamma);
+	pow		$tmp22 XPos $const11 	%line{39} %argrw{"wrr"}
+	pow		$tmp23 YPos $const11 	%argrw{"wrr"}
+	add		$tmp24 $tmp22 $tmp23 	%argrw{"wrr"}
+	pow		$tmp25 ZPos $const11 	%argrw{"wrr"}
+	add		$tmp26 $tmp24 $tmp25 	%argrw{"wrr"}
+	sqrt		$tmp21 $tmp26 	%argrw{"wr"}
+	mul		$tmp27 invMult $tmp21 	%argrw{"wrr"}
+	sub		$tmp28 $const10 $tmp27 	%argrw{"wrr"}
+	mul		$tmp29 mult $tmp28 	%argrw{"wrr"}
+	functioncall	$const13 45 	%argrw{"r"}
+# /opt/solidangle/mtoa/2019/osl/include/stdosl.h:141
+# float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
+	min		$tmp30 $tmp29 $const10 	%filename{"/opt/solidangle/mtoa/2019/osl/include/stdosl.h"} %line{141} %argrw{"wrr"}
+	max		$tmp20 $tmp30 $const12 	%argrw{"wrr"}
+# jiPMask.osl:39
+# 	Mask = pow(clamp(mult*(1-(invMult*(sqrt(pow(XPos,2)+pow(YPos,2)+pow(ZPos,2))))),0,1),1/gamma);
+	div		$tmp31 $const10 gamma 	%filename{"jiPMask.osl"} %line{39} %argrw{"wrr"}
+	pow		Mask $tmp20 $tmp31 	%argrw{"wrr"}
+	end

@@ -1,0 +1,71 @@
+#include <stdosl.h>
+#define MAX_TILES 10
+
+shader jiUdimMask(
+		string UDIMs = "1001" 
+			[[ string help = "Comma-separated UDIMs. You can also specify ranges. Example: 1001,1003,1011-1014" ]],
+    	int raw_UDIM_output = 0
+        	[[  string help = "Enable Total Internal Reflection",
+            	string widget = "checkBox" ]],		
+        output float out = 0
+	)
+
+{
+	// Raw UDIM
+	int udim = int( 1000+(floor(u)+1)+(floor(v)*10) );
+
+	// Output Raw UDIMs
+	if (raw_UDIM_output){
+		out = float(udim);
+
+	} else {
+
+		// Check if input is a valid string
+		int udim_validator = regex_match(UDIMs, "[0-9]{4}([,-][0-9]{4})*");
+	
+		if (udim_validator == 1){
+			// Split elements by comma into udim_array
+			string udim_array[MAX_TILES];
+			split(UDIMs, udim_array, ",");
+	
+			// Define base variables
+			int udim_result = 0;
+			int start_index;
+			int end_index;
+	
+			// Range array for multi-range elements
+			string cur_range[2];
+	
+			for (int i=0; i<10; i++) {
+				// iteration works by default because "null" is silently ignored
+	
+				//check if "-" delimiter is found in current match
+				if (regex_search(udim_array[i], "-") == 1){
+					split(udim_array[i], cur_range, "-");
+					start_index = stoi(cur_range[0]);
+					end_index = stoi(cur_range[1]);
+	
+					for (int d=start_index; d<end_index+1; d++){
+						if (d == udim){
+							udim_result += 1;
+						}
+					}
+	
+	
+				} else {
+					int cur_udim = stoi(udim_array[i]);
+					if (cur_udim == udim){
+						udim_result += 1;
+					}
+				}
+			}
+	
+			out = clamp(udim_result,0,1);
+	
+		// Print warning if invalid string is detected
+		} else {
+			warning ("%s%s", UDIMs, " is not a valid input. Use a comma-separated list of UDIMs. Ranges can be specified with '-'. Eg: 1001,1003-1005,1012");
+			out = 0;
+		}
+	}
+}
