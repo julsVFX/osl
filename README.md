@@ -1,2 +1,2 @@
 OSL shaders 
-Mostly tested with Arnold/PRMan/Blender
+mostly tested with Arnold/PRMan/Blender
