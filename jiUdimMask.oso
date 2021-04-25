@@ -1,0 +1,163 @@
+OpenShadingLanguage 1.00
+# Compiled by oslc 1.11.6
+# options: 
+shader jiUdimMask
+param	string	UDIMs	"1001"		%meta{string,help,"Comma-separated UDIMs. You can also specify ranges. Example: 1001,1003,1011-1014"}  %read{10,50} %write{2147483647,-1}
+param	int	raw_UDIM_output	0		%meta{string,help,"Enable Total Internal Reflection"} %meta{string,widget,"checkBox"}  %read{7,7} %write{2147483647,-1}
+oparam	float	out	0		%read{2147483647,-1} %write{9,51}
+global	float	u	%read{0,0} %write{2147483647,-1}
+global	float	v	%read{3,3} %write{2147483647,-1}
+local	int	udim	%read{8,45} %write{6,6}
+local	int	___338_udim_validator	%read{11,11} %write{10,10}
+local	string[10]	___339_udim_array	%read{17,45} %write{13,13}
+local	int	___339_udim_result	%read{17,47} %write{14,45}
+local	int	___339_start_index	%read{17,45} %write{17,45}
+local	int	___339_end_index	%read{17,45} %write{17,45}
+local	string[2]	___339_cur_range	%read{17,45} %write{17,45}
+local	int	___340_i	%read{17,45} %write{16,45}
+local	int	___343_d	%read{17,45} %write{17,45}
+local	int	___346_cur_udim	%read{17,45} %write{17,45}
+temp	float	$tmp1	%read{1,1} %write{0,0}
+const	int	$const2	1		%read{11,47} %write{2147483647,-1}
+temp	float	$tmp2	%read{2,2} %write{1,1}
+const	float	$const3	1		%read{1,1} %write{2147483647,-1}
+temp	float	$tmp3	%read{5,5} %write{2,2}
+const	float	$const4	1000		%read{2,2} %write{2147483647,-1}
+temp	float	$tmp4	%read{4,4} %write{3,3}
+const	int	$const5	10		%read{17,17} %write{2147483647,-1}
+temp	float	$tmp5	%read{5,5} %write{4,4}
+const	float	$const6	10		%read{4,4} %write{2147483647,-1}
+temp	float	$tmp6	%read{6,6} %write{5,5}
+temp	float	$tmp7	%read{9,9} %write{8,8}
+const	string	$const7	"[0-9]{4}([,-][0-9]{4})*"		%read{10,10} %write{2147483647,-1}
+temp	int	$tmp8	%read{12,12} %write{11,11}
+temp	int	$tmp9	%read{2147483647,-1} %write{13,13}
+const	string	$const8	","		%read{13,13} %write{2147483647,-1}
+const	int	$const9	0		%read{14,51} %write{2147483647,-1}
+temp	int	$tmp10	%read{17,45} %write{17,45}
+temp	int	$tmp11	%read{15,45} %write{16,45}
+temp	int	$tmp12	%read{17,45} %write{17,45}
+temp	string	$tmp13	%read{17,45} %write{17,45}
+const	string	$const10	"-"		%read{20,24} %write{2147483647,-1}
+temp	int	$tmp14	%read{17,45} %write{17,45}
+temp	int	$tmp15	%read{2147483647,-1} %write{17,45}
+temp	string	$tmp16	%read{17,45} %write{17,45}
+temp	string	$tmp17	%read{17,45} %write{17,45}
+temp	string	$tmp18	%read{17,45} %write{17,45}
+temp	int	$tmp19	%read{17,45} %write{17,45}
+temp	int	$tmp20	%read{17,45} %write{17,45}
+temp	int	$tmp21	%read{17,45} %write{17,45}
+temp	int	$tmp22	%read{17,45} %write{17,45}
+temp	int	$tmp23	%read{2147483647,-1} %write{17,45}
+temp	string	$tmp24	%read{17,45} %write{17,45}
+temp	int	$tmp25	%read{17,45} %write{17,45}
+temp	int	$tmp26	%read{2147483647,-1} %write{17,45}
+temp	int	$tmp27	%read{49,49} %write{48,48}
+const	string	$const11	"clamp"		%read{46,46} %write{2147483647,-1}
+temp	int	$tmp28	%read{48,48} %write{47,47}
+const	string	$const12	"%s%s"		%read{50,50} %write{2147483647,-1}
+const	string	$const13	" is not a valid input. Use a comma-separated list of UDIMs. Ranges can be specified with '-'. Eg: 1001,1003-1005,1012"		%read{50,50} %write{2147483647,-1}
+code ___main___
+# jiUdimMask.osl:15
+# 	int udim = int( 1000+(floor(u)+1)+(floor(v)*10) );
+	floor		$tmp1 u 	%filename{"jiUdimMask.osl"} %line{15} %argrw{"wr"}
+	add		$tmp2 $tmp1 $const3 	%argrw{"wrr"}
+	add		$tmp3 $const4 $tmp2 	%argrw{"wrr"}
+	floor		$tmp4 v 	%argrw{"wr"}
+	mul		$tmp5 $tmp4 $const6 	%argrw{"wrr"}
+	add		$tmp6 $tmp3 $tmp5 	%argrw{"wrr"}
+	assign		udim $tmp6 	%argrw{"wr"}
+# jiUdimMask.osl:18
+# 	if (raw_UDIM_output){
+	if		raw_UDIM_output 10 52 	%line{18} %argrw{"r"}
+# jiUdimMask.osl:19
+# 		out = float(udim);
+	assign		$tmp7 udim 	%line{19} %argrw{"wr"}
+	assign		out $tmp7 	%argrw{"wr"}
+# jiUdimMask.osl:24
+# 		int udim_validator = regex_match(UDIMs, "[0-9]{4}([,-][0-9]{4})*");
+	regex_match	___338_udim_validator UDIMs $const7 	%line{24} %argrw{"wrr"}
+# jiUdimMask.osl:26
+# 		if (udim_validator == 1){
+	eq		$tmp8 ___338_udim_validator $const2 	%line{26} %argrw{"wrr"}
+	if		$tmp8 50 52 	%argrw{"r"}
+# jiUdimMask.osl:29
+# 			split(UDIMs, udim_array, ",");
+	split		$tmp9 UDIMs ___339_udim_array $const8 	%line{29} %argrw{"wrwr"}
+# jiUdimMask.osl:32
+# 			int udim_result = 0;
+	assign		___339_udim_result $const9 	%line{32} %argrw{"wr"}
+# jiUdimMask.osl:39
+# 			for (int i=0; i<10; i++) {
+	for		$tmp11 17 19 44 46 	%line{39} %argrw{"r"}
+	assign		___340_i $const9 	%argrw{"wr"}
+	lt		$tmp10 ___340_i $const5 	%argrw{"wrr"}
+	neq		$tmp11 $tmp10 $const9 	%argrw{"wrr"}
+# jiUdimMask.osl:43
+# 				if (regex_search(udim_array[i], "-") == 1){
+	aref		$tmp13 ___339_udim_array ___340_i 	%line{43} %argrw{"wrr"}
+	regex_search	$tmp12 $tmp13 $const10 	%argrw{"wrr"}
+	eq		$tmp14 $tmp12 $const2 	%argrw{"wrr"}
+	if		$tmp14 39 44 	%argrw{"r"}
+# jiUdimMask.osl:44
+# 					split(udim_array[i], cur_range, "-");
+	aref		$tmp16 ___339_udim_array ___340_i 	%line{44} %argrw{"wrr"}
+	split		$tmp15 $tmp16 ___339_cur_range $const10 	%argrw{"wrwr"}
+# jiUdimMask.osl:45
+# 					start_index = stoi(cur_range[0]);
+	aref		$tmp17 ___339_cur_range $const9 	%line{45} %argrw{"wrr"}
+	stoi		___339_start_index $tmp17 	%argrw{"wr"}
+# jiUdimMask.osl:46
+# 					end_index = stoi(cur_range[1]);
+	aref		$tmp18 ___339_cur_range $const2 	%line{46} %argrw{"wrr"}
+	stoi		___339_end_index $tmp18 	%argrw{"wr"}
+# jiUdimMask.osl:48
+# 					for (int d=start_index; d<end_index+1; d++){
+	for		$tmp21 31 34 37 39 	%line{48} %argrw{"r"}
+	assign		___343_d ___339_start_index 	%argrw{"wr"}
+	add		$tmp19 ___339_end_index $const2 	%argrw{"wrr"}
+	lt		$tmp20 ___343_d $tmp19 	%argrw{"wrr"}
+	neq		$tmp21 $tmp20 $const9 	%argrw{"wrr"}
+# jiUdimMask.osl:49
+# 						if (d == udim){
+	eq		$tmp22 ___343_d udim 	%line{49} %argrw{"wrr"}
+	if		$tmp22 37 37 	%argrw{"r"}
+# jiUdimMask.osl:50
+# 							udim_result += 1;
+	add		___339_udim_result ___339_udim_result $const2 	%line{50} %argrw{"wrr"}
+# jiUdimMask.osl:48
+# 					for (int d=start_index; d<end_index+1; d++){
+	assign		$tmp23 ___343_d 	%line{48} %argrw{"wr"}
+	add		___343_d ___343_d $const2 	%argrw{"wrr"}
+# jiUdimMask.osl:56
+# 					int cur_udim = stoi(udim_array[i]);
+	aref		$tmp24 ___339_udim_array ___340_i 	%line{56} %argrw{"wrr"}
+	stoi		___346_cur_udim $tmp24 	%argrw{"wr"}
+# jiUdimMask.osl:57
+# 					if (cur_udim == udim){
+	eq		$tmp25 ___346_cur_udim udim 	%line{57} %argrw{"wrr"}
+	if		$tmp25 44 44 	%argrw{"r"}
+# jiUdimMask.osl:58
+# 						udim_result += 1;
+	add		___339_udim_result ___339_udim_result $const2 	%line{58} %argrw{"wrr"}
+# jiUdimMask.osl:39
+# 			for (int i=0; i<10; i++) {
+	assign		$tmp26 ___340_i 	%line{39} %argrw{"wr"}
+	add		___340_i ___340_i $const2 	%argrw{"wrr"}
+# jiUdimMask.osl:63
+# 			out = clamp(udim_result,0,1);
+	functioncall	$const11 49 	%line{63} %argrw{"r"}
+# /opt/solidangle/mtoa/2019/osl/include/stdosl.h:142
+# int    clamp (int x, int minval, int maxval) { return max(min(x,maxval),minval); }
+	min		$tmp28 ___339_udim_result $const2 	%filename{"/opt/solidangle/mtoa/2019/osl/include/stdosl.h"} %line{142} %argrw{"wrr"}
+	max		$tmp27 $tmp28 $const9 	%argrw{"wrr"}
+# jiUdimMask.osl:63
+# 			out = clamp(udim_result,0,1);
+	assign		out $tmp27 	%filename{"jiUdimMask.osl"} %line{63} %argrw{"wr"}
+# jiUdimMask.osl:67
+# 			warning ("%s%s", UDIMs, " is not a valid input. Use a comma-separated list of UDIMs. Ranges can be specified with '-'. Eg: 1001,1003-1005,1012");
+	warning		$const12 UDIMs $const13 	%line{67} %argrw{"rrr"}
+# jiUdimMask.osl:68
+# 			out = 0;
+	assign		out $const9 	%line{68} %argrw{"wr"}
+	end
