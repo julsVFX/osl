@@ -1,0 +1,27 @@
+shader jiTraceAOVs(
+    string trace_component = "P",
+    color trace_color = 1,
+    output color out=0
+)
+
+{
+color out_component;
+
+//eye vector for reflections
+vector eye = I * ( abs(N) * 2 - 1);
+
+int hit = trace(P, -eye);
+
+if (hit)
+    {
+        //get reflected component
+        int trace_msg = getmessage("trace", trace_component, out_component);
+        //set to "trace_color" if component doesn't exist
+        if (trace_msg == 1)  
+            out = out_component;
+        else 
+            out = trace_color;
+    }
+
+}
+
