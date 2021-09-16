@@ -25,12 +25,8 @@ shader jiTraceAOVs(
     else
         traceset_name = traceset;
 
-
-    //eye vector for reflections
-    vector eye = I * ( abs(N) * 2 - 1);
-
-
-    int hit = trace(P, -eye, "traceset", traceset_name);
+    //trace reflection
+    int hit = trace(P, reflect(I,N), "traceset", traceset_name);
     if (hit)
     {
         //calc trace distance
@@ -38,7 +34,7 @@ shader jiTraceAOVs(
         {
             point trace_P; 
             getmessage("trace", "P", trace_P);
-            out = length(trace_P - P)/100;
+            out = length( (trace_P - P) * abs(N)) / 100;
         }
         else
         {

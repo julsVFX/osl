@@ -2,29 +2,28 @@ OpenShadingLanguage 1.00
 # Compiled by oslc 1.11.6
 # options: 
 shader jiTraceAOVs
-param	string	trace_component	"P"		%meta{string,help,"The name of the component to reflect. OSL globals such as P, N, u, v as well as arbitrary userdata such as Pref are supported."}  %read{11,23} %write{2147483647,-1}
-param	color	trace_color	1 1 1		%meta{string,help,"The color to be used if trace_component is not found."}  %read{27,27} %write{2147483647,-1}
+param	string	trace_component	"P"		%meta{string,help,"The name of the component to reflect. OSL globals such as P, N, u, v as well as arbitrary userdata such as Pref are supported."}  %read{11,25} %write{2147483647,-1}
+param	color	trace_color	1 1 1		%meta{string,help,"The color to be used if trace_component is not found."}  %read{29,29} %write{2147483647,-1}
 param	string	traceset	""		%meta{string,help,"The name of the traceset (optional). Can be used to exclude all geo of an environment if it contains multiple shapes."}  %read{2,3} %write{2147483647,-1}
 param	int	inclusive	1		%meta{string,widget,"checkBox"} %meta{string,help,"ON is inclusive. OFF is exclusive."}  %read{0,0} %write{2147483647,-1}
-oparam	color	out	0 0 0		%read{2147483647,-1} %write{22,27}
+oparam	color	out	0 0 0		%read{2147483647,-1} %write{24,29}
 global	point	P	%read{9,19} %write{2147483647,-1} %derivs
-global	vector	I	%read{7,7} %write{2147483647,-1} %derivs
-global	normal	N	%read{4,4} %write{2147483647,-1} %derivs
-local	color	out_component	%read{26,26} %write{23,23}
+global	vector	I	%read{5,8} %write{2147483647,-1} %derivs
+global	normal	N	%read{5,20} %write{2147483647,-1} %derivs
+local	color	out_component	%read{28,28} %write{25,25}
 local	string	traceset_name	%read{9,9} %write{2,3}
-local	vector	eye	%read{8,8} %write{7,7} %derivs
 local	int	hit	%read{10,10} %write{9,9}
 local	point	___338_trace_P	%read{19,19} %write{18,18}
-local	int	___339_trace_msg	%read{24,24} %write{23,23}
-const	int	$const1	1		%read{0,24} %write{2147483647,-1}
+local	int	___339_trace_msg	%read{26,26} %write{25,25}
+const	int	$const1	1		%read{0,26} %write{2147483647,-1}
 temp	int	$tmp1	%read{1,1} %write{0,0}
 const	string	$const2	"-%s"		%read{2,2} %write{2147483647,-1}
-temp	normal	$tmp2	%read{5,5} %write{4,4} %derivs
-temp	normal	$tmp3	%read{6,6} %write{5,5} %derivs
-const	float	$const4	2		%read{5,5} %write{2147483647,-1}
-temp	normal	$tmp4	%read{7,7} %write{6,6} %derivs
-const	float	$const5	1		%read{6,6} %write{2147483647,-1}
-temp	vector	$tmp5	%read{9,9} %write{8,8} %derivs
+temp	vector	$tmp2	%read{9,9} %write{8,8} %derivs
+const	string	$const3	"reflect"		%read{4,4} %write{2147483647,-1}
+temp	float	$tmp3	%read{6,6} %write{5,5} %derivs
+temp	float	$tmp4	%read{7,7} %write{6,6} %derivs
+const	float	$const5	2		%read{6,6} %write{2147483647,-1}
+temp	vector	$tmp5	%read{8,8} %write{7,7} %derivs
 const	string	$const6	"traceset"		%read{9,9} %write{2147483647,-1}
 const	string	$const7	"distance"		%read{11,11} %write{2147483647,-1}
 temp	int	$tmp6	%read{12,12} %write{11,11}
@@ -34,13 +33,15 @@ const	string	$const9	"dist"		%read{14,14} %write{2147483647,-1}
 temp	int	$tmp8	%read{15,15} %write{14,14}
 temp	int	$tmp9	%read{16,16} %write{15,15}
 temp	int	$tmp10	%read{2147483647,-1} %write{18,18}
-const	string	$const10	"trace"		%read{18,23} %write{2147483647,-1}
+const	string	$const10	"trace"		%read{18,25} %write{2147483647,-1}
 const	string	$const11	"P"		%read{18,18} %write{2147483647,-1}
-temp	float	$tmp11	%read{21,21} %write{20,20}
-temp	vector	$tmp12	%read{20,20} %write{19,19}
-temp	float	$tmp13	%read{22,22} %write{21,21}
-const	float	$const13	100		%read{21,21} %write{2147483647,-1}
-temp	int	$tmp14	%read{25,25} %write{24,24}
+temp	float	$tmp11	%read{23,23} %write{22,22}
+temp	vector	$tmp12	%read{21,21} %write{19,19}
+temp	normal	$tmp13	%read{21,21} %write{20,20}
+temp	vector	$tmp14	%read{22,22} %write{21,21}
+temp	float	$tmp15	%read{24,24} %write{23,23}
+const	float	$const13	100		%read{23,23} %write{2147483647,-1}
+temp	int	$tmp16	%read{27,27} %write{26,26}
 code ___main___
 # jiTraceAOVs.osl:23
 #     if (inclusive < 1)
@@ -52,48 +53,52 @@ code ___main___
 # jiTraceAOVs.osl:26
 #         traceset_name = traceset;
 	assign		traceset_name traceset 	%line{26} %argrw{"wr"}
+# jiTraceAOVs.osl:29
+#     int hit = trace(P, reflect(I,N), "traceset", traceset_name);
+	functioncall	$const3 9 	%line{29} %argrw{"r"}
+# /opt/solidangle/mtoa/2019/osl/include/stdosl.h:212
+# vector reflect (vector I, vector N) { return I - 2*dot(N,I)*N; }
+	dot		$tmp3 N I 	%filename{"/opt/solidangle/mtoa/2019/osl/include/stdosl.h"} %line{212} %argrw{"wrr"}
+	mul		$tmp4 $const5 $tmp3 	%argrw{"wrr"}
+	mul		$tmp5 $tmp4 N 	%argrw{"wrr"}
+	sub		$tmp2 I $tmp5 	%argrw{"wrr"}
+# jiTraceAOVs.osl:29
+#     int hit = trace(P, reflect(I,N), "traceset", traceset_name);
+	trace		hit P $tmp2 $const6 traceset_name 	%filename{"jiTraceAOVs.osl"} %line{29} %argrw{"wrrrr"} %argderivs{1,2}
 # jiTraceAOVs.osl:30
-#     vector eye = I * ( abs(N) * 2 - 1);
-	abs		$tmp2 N 	%line{30} %argrw{"wr"}
-	mul		$tmp3 $tmp2 $const4 	%argrw{"wrr"}
-	sub		$tmp4 $tmp3 $const5 	%argrw{"wrr"}
-	mul		eye I $tmp4 	%argrw{"wrr"}
-# jiTraceAOVs.osl:33
-#     int hit = trace(P, -eye, "traceset", traceset_name);
-	neg		$tmp5 eye 	%line{33} %argrw{"wr"}
-	trace		hit P $tmp5 $const6 traceset_name 	%argrw{"wrrrr"} %argderivs{1,2}
-# jiTraceAOVs.osl:34
 #     if (hit)
-	if		hit 28 28 	%line{34} %argrw{"r"}
-# jiTraceAOVs.osl:37
+	if		hit 30 30 	%line{30} %argrw{"r"}
+# jiTraceAOVs.osl:33
 #         if (trace_component == "distance" || trace_component == "dist")
-	eq		$tmp6 trace_component $const7 	%line{37} %argrw{"wrr"}
+	eq		$tmp6 trace_component $const7 	%line{33} %argrw{"wrr"}
 	neq		$tmp7 $tmp6 $const8 	%argrw{"wrr"}
 	if		$tmp7 14 17 	%argrw{"r"}
 	eq		$tmp8 trace_component $const9 	%argrw{"wrr"}
 	neq		$tmp9 $tmp8 $const8 	%argrw{"wrr"}
 	assign		$tmp7 $tmp9 	%argrw{"wr"}
-	if		$tmp7 23 28 	%argrw{"r"}
-# jiTraceAOVs.osl:40
+	if		$tmp7 25 30 	%argrw{"r"}
+# jiTraceAOVs.osl:36
 #             getmessage("trace", "P", trace_P);
-	getmessage	$tmp10 $const10 $const11 ___338_trace_P 	%line{40} %argrw{"wrrw"}
-# jiTraceAOVs.osl:41
-#             out = length(trace_P - P)/100;
-	sub		$tmp12 ___338_trace_P P 	%line{41} %argrw{"wrr"}
-	length		$tmp11 $tmp12 	%argrw{"wr"}
-	div		$tmp13 $tmp11 $const13 	%argrw{"wrr"}
-	assign		out $tmp13 	%argrw{"wr"}
-# jiTraceAOVs.osl:46
+	getmessage	$tmp10 $const10 $const11 ___338_trace_P 	%line{36} %argrw{"wrrw"}
+# jiTraceAOVs.osl:37
+#             out = length( (trace_P - P) * abs(N)) / 100;
+	sub		$tmp12 ___338_trace_P P 	%line{37} %argrw{"wrr"}
+	abs		$tmp13 N 	%argrw{"wr"}
+	mul		$tmp14 $tmp12 $tmp13 	%argrw{"wrr"}
+	length		$tmp11 $tmp14 	%argrw{"wr"}
+	div		$tmp15 $tmp11 $const13 	%argrw{"wrr"}
+	assign		out $tmp15 	%argrw{"wr"}
+# jiTraceAOVs.osl:42
 #             int trace_msg = getmessage("trace", trace_component, out_component);
-	getmessage	___339_trace_msg $const10 trace_component out_component 	%line{46} %argrw{"wrrw"}
-# jiTraceAOVs.osl:48
+	getmessage	___339_trace_msg $const10 trace_component out_component 	%line{42} %argrw{"wrrw"}
+# jiTraceAOVs.osl:44
 #             if (trace_msg == 1)  
-	eq		$tmp14 ___339_trace_msg $const1 	%line{48} %argrw{"wrr"}
-	if		$tmp14 27 28 	%argrw{"r"}
-# jiTraceAOVs.osl:49
+	eq		$tmp16 ___339_trace_msg $const1 	%line{44} %argrw{"wrr"}
+	if		$tmp16 29 30 	%argrw{"r"}
+# jiTraceAOVs.osl:45
 #                 out = out_component;
-	assign		out out_component 	%line{49} %argrw{"wr"}
-# jiTraceAOVs.osl:51
+	assign		out out_component 	%line{45} %argrw{"wr"}
+# jiTraceAOVs.osl:47
 #                 out = trace_color;
-	assign		out trace_color 	%line{51} %argrw{"wr"}
+	assign		out trace_color 	%line{47} %argrw{"wr"}
 	end
