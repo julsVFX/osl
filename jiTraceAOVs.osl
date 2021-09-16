@@ -1,3 +1,7 @@
+//Traces secondary outputs for use in comp in a single render layer
+//currently only works reliably with later versions of Arnold
+//Julius Ihle 2021
+
 shader jiTraceAOVs(
     string trace_component = "P",
     color trace_color = 1,
@@ -5,22 +9,32 @@ shader jiTraceAOVs(
 )
 
 {
-color out_component;
+    color out_component;
 
-//eye vector for reflections
-vector eye = I * ( abs(N) * 2 - 1);
+    //eye vector for reflections
+    vector eye = I * ( abs(N) * 2 - 1);
 
-int hit = trace(P, -eye);
+    int hit = trace(P, -eye);
 
-if (hit)
+    if (hit)
     {
-        //get reflected component
-        int trace_msg = getmessage("trace", trace_component, out_component);
-        //set to "trace_color" if component doesn't exist
-        if (trace_msg == 1)  
-            out = out_component;
-        else 
-            out = trace_color;
+        //calc trace distance
+        if (trace_component == "distance" || trace_component == "dist")
+        {
+            point trace_P; 
+            getmessage("trace", "P", trace_P);
+            out = length(trace_P - P)/100;
+        }
+        else
+        {
+            //get reflected component
+            int trace_msg = getmessage("trace", trace_component, out_component);
+            //set to "trace_color" if component doesn't exist
+            if (trace_msg == 1)  
+                out = out_component;
+            else 
+                out = trace_color;
+        }
     }
 
 }
