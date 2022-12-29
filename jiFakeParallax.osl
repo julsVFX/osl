@@ -1,0 +1,90 @@
+#include <stdosl.h>
+
+/*
+jiFakeParallax shader.
+Projects texture "inside" a given geometry to simmulate the illusion of depth
+by Julius Ihle 2022
+*/
+
+
+vector calc_projection(float d, point PP)
+{
+    //tangent space matrix technique from Martin Geupel
+    normal NN = Ng;
+    normal tangent = normalize(dPdu);
+    normal bitangent = cross(tangent, NN);
+    matrix tangentspace = 1.0 / matrix("world", 
+                            tangent[0],     tangent[1],     tangent[2],     0.0,
+                            bitangent[0],   bitangent[1],   bitangent[2],   0.0,
+                            NN[0],          NN[1],          NN[2],          0.0,
+                            0.0,            0.0,            0.0,            1.0);
+    normal II = transform(tangentspace, normal(-I)) * -1;
+
+    //offset vector
+    vector RO = II * (d / abs(II[2]));
+    point PPO = PP + RO;
+    return PPO;
+}
+
+//function to convert rgb to a single float
+float rgb_to_float(color in_col, string channel)
+{
+    if (channel == "r")
+        return in_col[0];
+    else if (channel == "g")
+        return in_col[1];
+    else if (channel == "b")
+        return in_col[2];
+    else 
+        return (in_col[0] + in_col[1] + in_col[2]) / 3;
+}
+
+shader jiFakeParallax(
+    string filename = "" 
+        [[ string widget = "filename",
+           string help = "The texture file to project." ]],
+    string depth_channel = "average"
+        [[ string widget = "popup",
+           string options = "average|r|g|b" ]],
+    int steps = 1,
+    vector scale = 1,
+    vector offset = 0,
+    int invert_depth = 1
+        [[ string widget = "boolean",
+           string help = "Whether to invert the depth projection or not. ON means that black pixels push in and white pixels stays on top of the surface and vice-versa." ]],
+    float depth = 1 
+        [[ float min = 0, float max = 5 ]],
+    float roughness = 0
+        [[ float min = 0, float max = 1 ]],
+    output color out = 0
+)
+{  
+    //set uvs
+    point uvs = vector(u, -v, 0) * scale + offset;
+
+    //define breakup texture
+    color breakup_tex_col = texture(filename, uvs[0], uvs[1], "wrap", "periodic");
+    float breakup_tex = rgb_to_float(breakup_tex_col, depth_channel);
+    if (invert_depth > 0)
+        breakup_tex = 1-breakup_tex;
+
+    vector RO;
+    vector PPO;
+    vector proj_uvs;
+    color out_color = 0;
+    int ssteps = clamp(steps, 1, 100);
+    int steps_loop = ssteps + 1;
+
+    for (int s=1; s < steps_loop; s++)
+    {
+        //set depth
+        float cur_depth = (depth * 0.1) / ssteps * s;
+        float dd = cur_depth * breakup_tex;
+
+        //create projection
+        proj_uvs = calc_projection(dd, uvs);
+        out_color += texture(filename, proj_uvs[0], proj_uvs[1], "wrap", "periodic", "blur", roughness * cur_depth * 0.5);
+
+    }
+    out = out_color/ssteps;
+}
