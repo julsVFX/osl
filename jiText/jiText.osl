@@ -1,0 +1,124 @@
+#include <stdosl.h>
+
+shader jiText(
+    string font_source = "" 
+        [[ string widget = "filename" ,
+           string help = "File path to the font source images with a hash for the ascii numbers- eg /path/to/ascii/#.tif"]],
+    string text = "Hello World!" 
+        [[ string help = "Text to output in the shader. Use \\\n for new lines." ]],
+    color false_color = color(1,0,1),
+    color text_color = 1,
+    float text_size = 0.1,
+    int align = 0 
+        [[ string widget = "mapper", 
+           string options = "left:0|right:1" ]],
+    vector uvcoords = 0 
+        [[ string help = "Input for custom uv coordinates. Will use surface uvs if unconnected" ]],
+    int swap_uv = 0 
+        [[ string widget = "checkBox" ]],
+    int mirror_u = 0 
+        [[ string widget = "checkBox" ]],
+    int mirror_v = 0 
+        [[ string widget = "checkBox" ]],
+    float offset_u = 0,
+    float offset_v = 0,
+    float tracking = 1 
+        [[ string help = "Spacing between letters in u direction." ]],
+    float leading = 1 
+        [[ string help = "Spacing between new lines in v direction." ]],
+    output color out = 0
+)
+
+
+{
+    //check for hash in font_source
+    //split font source at # to replace downstream with ascii num
+    string font_source_split[2] = {""};
+    int hash_validator = split (font_source, font_source_split, "#");
+    //printf("%i", hash_validator);
+    if (hash_validator < 2)
+    {
+        warning ("%s%s\n", font_source, " is not a valid input. \nMake sure you use a file path to the ascii images including a # symbol for the number.\nFor example: /path/to/Arial/#.tif\nIf your DCC auto-converts # to the frame number make sure you stop expansion via \#.");
+        out = false_color;
+    }
+    else
+    {
+        //get input uvs
+        float in_u = u;
+        float in_v = v;
+        if (isconnected(uvcoords) > 0)
+        {
+            in_u = uvcoords[0];
+            in_v = uvcoords[1];
+        }
+        //base uvs - tiled
+        //v is mirrored for arnold
+        float base_u, base_v;
+        swap_uv > 0 ? base_u = fmod(in_v,1) : base_u = fmod(in_u,1); 
+        swap_uv > 0 ? base_v = 1-fmod(in_u,1) : base_v = 1-fmod(in_v,1);
+        
+        //invert mirror_u if align is set to right
+        int mirror_horiz;
+        align > 0 ? mirror_horiz = 1-mirror_u : mirror_horiz = mirror_u;
+        
+        if (mirror_horiz > 0)
+            base_u = 1-base_u;
+        if (mirror_v > 0)
+            base_v = 1-base_v;
+        
+        //offsets
+        base_u = base_u - offset_u;
+        base_v = base_v + offset_v;
+        
+        //size
+        vector text_uv = vector(base_u/text_size, 
+                                base_v/text_size, 
+                                0);
+        
+        //split text to new lines based on "\\n" delimiter for new lines
+        string lines[10] = {""};
+        int new_lines = split(text, lines, "\\n");
+        
+        float output_text = 0;
+        //iterate over new lines
+        for (int l=0; l < arraylength(lines); l++)
+        {
+            //terminate if current line is empty
+            string cur_line = lines[l];
+            int cur_line_len = strlen(cur_line);
+            if (cur_line_len == 0)
+                break;
+            
+            //store previous size to determine distance for next letter
+            float prev_u_size = 0;
+            for (int i=0; i < cur_line_len; i++)
+            {
+                //grab characters left to right if left-align 
+                //grab characters right to left if right-align
+                int ascii;
+                if (align > 0)
+                    ascii = getchar(cur_line, cur_line_len-1-i);
+                else 
+                        ascii = getchar(cur_line, i);
+        
+                //file path to grab the current char
+                string char_path = concat(font_source_split[0], format("%i", ascii), font_source_split[1]);
+        
+                //get resolution and modify the width of the current char based on height/width ratio
+                int res[2] = {0};
+                if ( gettextureinfo(char_path, "resolution", res) )
+                {
+                    float tex_width_factor = float(res[0]) / float(res[1]);
+                    float align_u = (text_uv[0] - (prev_u_size*tracking)) / tex_width_factor;
+                    if (align > 0) 
+                        align_u = 1-align_u;
+                    output_text += texture (char_path, 
+	                                    align_u, 
+	                                    text_uv[1] - (l*leading));	
+                    prev_u_size += tex_width_factor;
+                }
+            }
+        }
+        out = output_text * text_color;
+    }
+}
