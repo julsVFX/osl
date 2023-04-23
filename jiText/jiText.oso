@@ -2,44 +2,44 @@ OpenShadingLanguage 1.00
 # Compiled by oslc 1.12.0
 # options: 
 shader jiText
-param	string	font_source	""		%meta{string,help,"File path to the font source images with a hash for the ascii numbers- eg /path/to/ascii/#.tif"} %meta{string,widget,"filename"}  %read{1,4} %write{2147483647,-1} %derivs
+param	string	font_source	""		%meta{string,widget,"filename"} %meta{string,help,"File path to the font source images with a hash for the ascii numbers- eg /path/to/ascii/#.tif"}  %read{1,4} %write{2147483647,-1} %derivs
 param	string	text	"Hello World!"		%meta{string,help,"Text to output in the shader. Use \\\n for new lines."}  %read{45,45} %write{2147483647,-1} %derivs
 param	color	false_color	1 0 1		%read{5,5} %write{2147483647,-1}
-param	color	text_color	1 1 1		%read{102,102} %write{2147483647,-1}
+param	color	text_color	1 1 1		%read{105,105} %write{2147483647,-1}
 param	float	text_size	0.100000001		%read{41,42} %write{2147483647,-1} %derivs
-param	int	align	0		%meta{string,widget,"popup"} %meta{string,options,"left|right"}  %read{27,88} %write{2147483647,-1}
+param	int	align	0		%meta{string,widget,"mapper"} %meta{string,options,"left:0|right:1"}  %read{27,91} %write{2147483647,-1}
 param	vector	uvcoords	0 0 0		%meta{string,help,"Input for custom uv coordinates. Will use surface uvs if unconnected"}  %read{8,12} %write{2147483647,-1} %derivs
 param	int	swap_uv	0		%meta{string,widget,"checkBox"}  %read{13,19} %write{2147483647,-1}
 param	int	mirror_u	0		%meta{string,widget,"checkBox"}  %read{29,31} %write{2147483647,-1}
 param	int	mirror_v	0		%meta{string,widget,"checkBox"}  %read{36,36} %write{2147483647,-1}
 param	float	offset_u	0		%read{39,39} %write{2147483647,-1} %derivs
 param	float	offset_v	0		%read{40,40} %write{2147483647,-1} %derivs
-param	float	tracking	1		%meta{string,help,"Spacing between letters in u direction."}  %read{85,85} %write{2147483647,-1} %derivs
-param	float	leading	1		%meta{string,help,"Spacing between new lines in v direction."}  %read{93,93} %write{2147483647,-1} %derivs
-oparam	color	out	0 0 0		%read{2147483647,-1} %write{5,102}
+param	float	tracking	1		%meta{string,help,"Spacing between letters in u direction."}  %read{86,86} %write{2147483647,-1} %derivs
+param	float	leading	1		%meta{string,help,"Spacing between new lines in v direction."}  %read{96,96} %write{2147483647,-1} %derivs
+oparam	color	out	0 0 0		%read{2147483647,-1} %write{5,105}
 global	float	u	%read{6,6} %write{2147483647,-1} %derivs
 global	float	v	%read{7,7} %write{2147483647,-1} %derivs
-local	string[2]	font_source_split	%read{49,101} %write{0,1} %derivs
+local	string[2]	font_source_split	%read{49,104} %write{0,1} %derivs
 local	int	hash_validator	%read{2,2} %write{1,1}
 local	float	___338_in_u	%read{17,21} %write{6,11} %derivs
 local	float	___338_in_v	%read{15,24} %write{7,12} %derivs
 local	float	___338_base_u	%read{16,41} %write{15,39} %derivs
 local	float	___338_base_v	%read{23,42} %write{22,40} %derivs
 local	int	___338_mirror_horiz	%read{30,33} %write{29,31}
-local	vector	___338_text_uv	%read{49,101} %write{43,43} %derivs
-local	string[10]	___338_lines	%read{49,101} %write{44,45} %derivs
+local	vector	___338_text_uv	%read{49,104} %write{43,43} %derivs
+local	string[10]	___338_lines	%read{49,104} %write{44,45} %derivs
 local	int	___338_new_lines	%read{2147483647,-1} %write{45,45}
-local	float	___338_output_text	%read{49,102} %write{46,101}
-local	int	___340_l	%read{49,101} %write{48,101} %derivs
-local	string	___341_cur_line	%read{49,101} %write{49,101} %derivs
-local	int	___341_cur_line_len	%read{49,101} %write{49,101} %derivs
-local	float	___341_prev_u_size	%read{49,101} %write{49,101} %derivs
-local	int	___342_i	%read{49,101} %write{49,101} %derivs
-local	int	___343_ascii	%read{49,101} %write{49,101} %derivs
-local	string	___343_char_path	%read{49,101} %write{49,101} %derivs
-local	int[2]	___343_res	%read{49,101} %write{49,101} %derivs
-local	float	___344_tex_width_factor	%read{49,101} %write{49,101} %derivs
-local	float	___344_align_u	%read{49,101} %write{49,101} %derivs
+local	float	___338_output_text	%read{49,105} %write{46,104}
+local	int	___340_l	%read{49,104} %write{48,104} %derivs
+local	string	___341_cur_line	%read{49,104} %write{49,104} %derivs
+local	int	___341_cur_line_len	%read{49,104} %write{49,104} %derivs
+local	float	___341_prev_u_size	%read{49,104} %write{49,104} %derivs
+local	int	___342_i	%read{49,104} %write{49,104} %derivs
+local	int	___343_ascii	%read{49,104} %write{49,104} %derivs
+local	string	___343_char_path	%read{49,104} %write{49,104} %derivs
+local	int[2]	___343_res	%read{49,104} %write{49,104} %derivs
+local	float	___344_tex_width_factor	%read{49,104} %write{49,104} %derivs
+local	float	___344_align_u	%read{49,104} %write{49,104} %derivs
 const	string[2]	$const1	"" "" 		%read{0,0} %write{2147483647,-1}
 const	string	$const2	"#"		%read{1,1} %write{2147483647,-1}
 const	int	$const3	2		%read{2,2} %write{2147483647,-1}
@@ -47,12 +47,12 @@ temp	int	$tmp1	%read{3,3} %write{2,2}
 const	string	$const4	"%s%s\n"		%read{4,4} %write{2147483647,-1}
 const	string	$const5	" is not a valid input. \nMake sure you use a file path to the ascii images including a # symbol for the number.\nFor example: /path/to/Arial/#.tif\nIf your DCC auto-converts # to the frame number make sure you stop expansion via \\#."		%read{4,4} %write{2147483647,-1}
 temp	int	$tmp2	%read{9,9} %write{8,8}
-const	int	$const6	0		%read{9,88} %write{2147483647,-1}
+const	int	$const6	0		%read{9,91} %write{2147483647,-1}
 temp	int	$tmp3	%read{10,10} %write{9,9}
-const	int	$const7	1		%read{12,101} %write{2147483647,-1}
+const	int	$const7	1		%read{12,104} %write{2147483647,-1}
 temp	float	$tmp4	%read{2147483647,-1} %write{16,18}
 temp	int	$tmp5	%read{14,14} %write{13,13}
-const	float	$const8	1		%read{15,90} %write{2147483647,-1}
+const	float	$const8	1		%read{15,93} %write{2147483647,-1}
 temp	float	$tmp6	%read{2147483647,-1} %write{23,26}
 temp	int	$tmp7	%read{20,20} %write{19,19}
 temp	float	$tmp8	%read{22,22} %write{21,21} %derivs
@@ -66,86 +66,89 @@ temp	float	$tmp15	%read{43,43} %write{42,42} %derivs
 const	float	$const9	0		%read{43,43} %write{2147483647,-1}
 const	string[10]	$const10	"" "" "" "" "" "" "" "" "" "" 		%read{44,44} %write{2147483647,-1}
 const	string	$const11	"\\n"		%read{45,45} %write{2147483647,-1}
-temp	int	$tmp16	%read{49,101} %write{49,101}
-temp	int	$tmp17	%read{49,101} %write{49,101}
-temp	int	$tmp18	%read{47,101} %write{48,101}
-temp	int	$tmp19	%read{49,101} %write{49,101}
-temp	int	$tmp20	%read{49,101} %write{49,101}
-temp	int	$tmp21	%read{49,101} %write{49,101}
-temp	int	$tmp22	%read{49,101} %write{49,101}
-temp	int	$tmp23	%read{49,101} %write{49,101} %derivs
-temp	int	$tmp24	%read{49,101} %write{49,101} %derivs
-temp	string	$tmp25	%read{49,101} %write{49,101} %derivs
-temp	string	$tmp26	%read{49,101} %write{49,101} %derivs
+temp	int	$tmp16	%read{49,104} %write{49,104}
+temp	int	$tmp17	%read{49,104} %write{49,104}
+temp	int	$tmp18	%read{47,104} %write{48,104}
+temp	int	$tmp19	%read{49,104} %write{49,104}
+temp	int	$tmp20	%read{49,104} %write{49,104}
+temp	int	$tmp21	%read{49,104} %write{49,104}
+temp	int	$tmp22	%read{49,104} %write{49,104}
+temp	int	$tmp23	%read{49,104} %write{49,104} %derivs
+temp	int	$tmp24	%read{49,104} %write{49,104} %derivs
+temp	string	$tmp25	%read{49,104} %write{49,104} %derivs
+temp	string	$tmp26	%read{49,104} %write{49,104} %derivs
 const	string	$const12	"%i"		%read{69,69} %write{2147483647,-1}
-temp	string	$tmp27	%read{49,101} %write{49,101} %derivs
+temp	string	$tmp27	%read{49,104} %write{49,104} %derivs
 const	string	$const13	"concat"		%read{71,71} %write{2147483647,-1}
-temp	string	$tmp28	%read{49,101} %write{49,101} %derivs
+temp	string	$tmp28	%read{49,104} %write{49,104} %derivs
 const	int[2]	$const14	0 0 		%read{74,74} %write{2147483647,-1}
-temp	int	$tmp29	%read{49,101} %write{49,101}
+temp	int	$tmp29	%read{49,104} %write{49,104}
 const	string	$const15	"resolution"		%read{75,75} %write{2147483647,-1}
-temp	float	$tmp30	%read{49,101} %write{49,101} %derivs
-temp	int	$tmp31	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp32	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp33	%read{49,101} %write{49,101} %derivs
-temp	int	$tmp34	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp35	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp36	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp37	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp38	%read{49,101} %write{49,101} %derivs
-temp	int	$tmp39	%read{49,101} %write{49,101}
-temp	float	$tmp40	%read{49,101} %write{49,101}
-temp	float	$tmp41	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp42	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp43	%read{49,101} %write{49,101} %derivs
-temp	float	$tmp44	%read{49,101} %write{49,101} %derivs
-temp	int	$tmp45	%read{2147483647,-1} %write{49,101}
-temp	int	$tmp46	%read{2147483647,-1} %write{49,101}
+temp	float	$tmp30	%read{49,104} %write{49,104} %derivs
+temp	int	$tmp31	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp32	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp33	%read{49,104} %write{49,104} %derivs
+temp	int	$tmp34	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp35	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp36	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp37	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp38	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp39	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp40	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp41	%read{49,104} %write{49,104} %derivs
+temp	int	$tmp42	%read{49,104} %write{49,104}
+temp	float	$tmp43	%read{49,104} %write{49,104}
+temp	float	$tmp44	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp45	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp46	%read{49,104} %write{49,104} %derivs
+temp	float	$tmp47	%read{49,104} %write{49,104} %derivs
+temp	int	$tmp48	%read{2147483647,-1} %write{49,104}
+temp	int	$tmp49	%read{2147483647,-1} %write{49,104}
 code ___main___
-# jiText_v002.osl:25
-#     string font_source_split[2] = {""};
-	assign		font_source_split $const1 	%filename{"jiText_v002.osl"} %line{25} %argrw{"wr"}
-# jiText_v002.osl:26
-#     int hash_validator = split (font_source, font_source_split, "#");
-	split		hash_validator font_source font_source_split $const2 	%line{26} %argrw{"wrwr"}
-# jiText_v002.osl:28
-#     if (hash_validator < 2)
-	lt		$tmp1 hash_validator $const3 	%line{28} %argrw{"wrr"}
-	if		$tmp1 6 103 	%argrw{"r"}
-# jiText_v002.osl:30
-#         warning ("%s%s\n", font_source, " is not a valid input. \nMake sure you use a file path to the ascii images including a # symbol for the number.\nFor example: /path/to/Arial/#.tif\nIf your DCC auto-converts # to the frame number make sure you stop expansion via \#.");
-	warning		$const4 font_source $const5 	%line{30} %argrw{"rrr"}
-# jiText_v002.osl:31
-#         out = false_color;
-	assign		out false_color 	%line{31} %argrw{"wr"}
 # jiText_v002.osl:36
-#         float in_u = u;
-	assign		___338_in_u u 	%line{36} %argrw{"wr"}
+#     string font_source_split[2] = {""};
+	assign		font_source_split $const1 	%filename{"jiText_v002.osl"} %line{36} %argrw{"wr"}
 # jiText_v002.osl:37
+#     int hash_validator = split (font_source, font_source_split, "#");
+	split		hash_validator font_source font_source_split $const2 	%line{37} %argrw{"wrwr"}
+# jiText_v002.osl:39
+#     if (hash_validator < 2)
+	lt		$tmp1 hash_validator $const3 	%line{39} %argrw{"wrr"}
+	if		$tmp1 6 106 	%argrw{"r"}
+# jiText_v002.osl:41
+#         warning ("%s%s\n", font_source, " is not a valid input. \nMake sure you use a file path to the ascii images including a # symbol for the number.\nFor example: /path/to/Arial/#.tif\nIf your DCC auto-converts # to the frame number make sure you stop expansion via \#.");
+	warning		$const4 font_source $const5 	%line{41} %argrw{"rrr"}
+# jiText_v002.osl:42
+#         out = false_color;
+	assign		out false_color 	%line{42} %argrw{"wr"}
+# jiText_v002.osl:47
+#         float in_u = u;
+	assign		___338_in_u u 	%line{47} %argrw{"wr"}
+# jiText_v002.osl:48
 #         float in_v = v;
-	assign		___338_in_v v 	%line{37} %argrw{"wr"}
-# jiText_v002.osl:38
+	assign		___338_in_v v 	%line{48} %argrw{"wr"}
+# jiText_v002.osl:49
 #         if (isconnected(uvcoords) > 0)
-	isconnected	$tmp2 uvcoords 	%line{38} %argrw{"wr"}
+	isconnected	$tmp2 uvcoords 	%line{49} %argrw{"wr"}
 	gt		$tmp3 $tmp2 $const6 	%argrw{"wrr"}
 	if		$tmp3 13 13 	%argrw{"r"}
-# jiText_v002.osl:40
+# jiText_v002.osl:51
 #             in_u = uvcoords[0];
-	compref		___338_in_u uvcoords $const6 	%line{40} %argrw{"wrr"}
-# jiText_v002.osl:41
+	compref		___338_in_u uvcoords $const6 	%line{51} %argrw{"wrr"}
+# jiText_v002.osl:52
 #             in_v = uvcoords[1];
-	compref		___338_in_v uvcoords $const7 	%line{41} %argrw{"wrr"}
-# jiText_v002.osl:46
+	compref		___338_in_v uvcoords $const7 	%line{52} %argrw{"wrr"}
+# jiText_v002.osl:57
 #         swap_uv > 0 ? base_u = fmod(in_v,1) : base_u = fmod(in_u,1); 
-	gt		$tmp5 swap_uv $const6 	%line{46} %argrw{"wrr"}
+	gt		$tmp5 swap_uv $const6 	%line{57} %argrw{"wrr"}
 	if		$tmp5 17 19 	%argrw{"r"}
 	fmod		___338_base_u ___338_in_v $const8 	%argrw{"wrr"}
 	assign		$tmp4 ___338_base_u 	%argrw{"wr"}
 	fmod		___338_base_u ___338_in_u $const8 	%argrw{"wrr"}
 	assign		$tmp4 ___338_base_u 	%argrw{"wr"}
-# jiText_v002.osl:47
+# jiText_v002.osl:58
 #         swap_uv > 0 ? base_v = 1-fmod(in_u,1) : base_v = 1-fmod(in_v,1);
-	gt		$tmp7 swap_uv $const6 	%line{47} %argrw{"wrr"}
+	gt		$tmp7 swap_uv $const6 	%line{58} %argrw{"wrr"}
 	if		$tmp7 24 27 	%argrw{"r"}
 	fmod		$tmp8 ___338_in_u $const8 	%argrw{"wrr"}
 	sub		___338_base_v $const8 $tmp8 	%argrw{"wrr"}
@@ -153,96 +156,96 @@ code ___main___
 	fmod		$tmp9 ___338_in_v $const8 	%argrw{"wrr"}
 	sub		___338_base_v $const8 $tmp9 	%argrw{"wrr"}
 	assign		$tmp6 ___338_base_v 	%argrw{"wr"}
-# jiText_v002.osl:51
+# jiText_v002.osl:62
 #         align > 0 ? mirror_horiz = 1-mirror_u : mirror_horiz = mirror_u;
-	gt		$tmp11 align $const6 	%line{51} %argrw{"wrr"}
+	gt		$tmp11 align $const6 	%line{62} %argrw{"wrr"}
 	if		$tmp11 31 33 	%argrw{"r"}
 	sub		___338_mirror_horiz $const7 mirror_u 	%argrw{"wrr"}
 	assign		$tmp10 ___338_mirror_horiz 	%argrw{"wr"}
 	assign		___338_mirror_horiz mirror_u 	%argrw{"wr"}
 	assign		$tmp10 ___338_mirror_horiz 	%argrw{"wr"}
-# jiText_v002.osl:53
-#         if (mirror_horiz > 0)
-	gt		$tmp12 ___338_mirror_horiz $const6 	%line{53} %argrw{"wrr"}
-	if		$tmp12 36 36 	%argrw{"r"}
-# jiText_v002.osl:54
-#             base_u = 1-base_u;
-	sub		___338_base_u $const8 ___338_base_u 	%line{54} %argrw{"wrr"}
-# jiText_v002.osl:55
-#         if (mirror_v > 0)
-	gt		$tmp13 mirror_v $const6 	%line{55} %argrw{"wrr"}
-	if		$tmp13 39 39 	%argrw{"r"}
-# jiText_v002.osl:56
-#             base_v = 1-base_v;
-	sub		___338_base_v $const8 ___338_base_v 	%line{56} %argrw{"wrr"}
-# jiText_v002.osl:59
-#         base_u = base_u - offset_u;
-	sub		___338_base_u ___338_base_u offset_u 	%line{59} %argrw{"wrr"}
-# jiText_v002.osl:60
-#         base_v = base_v + offset_v;
-	add		___338_base_v ___338_base_v offset_v 	%line{60} %argrw{"wrr"}
-# jiText_v002.osl:63
-#         vector text_uv = vector(base_u/text_size, 
-	div		$tmp14 ___338_base_u text_size 	%line{63} %argrw{"wrr"}
 # jiText_v002.osl:64
-#                                 base_v/text_size, 
-	div		$tmp15 ___338_base_v text_size 	%line{64} %argrw{"wrr"}
-# jiText_v002.osl:63
-#         vector text_uv = vector(base_u/text_size, 
-	vector		___338_text_uv $tmp14 $tmp15 $const9 	%line{63} %argrw{"wrrr"}
-# jiText_v002.osl:68
-#         string lines[10] = {""};
-	assign		___338_lines $const10 	%line{68} %argrw{"wr"}
-# jiText_v002.osl:69
-#         int new_lines = split(text, lines, "\\n");
-	split		___338_new_lines text ___338_lines $const11 	%line{69} %argrw{"wrwr"}
+#         if (mirror_horiz > 0)
+	gt		$tmp12 ___338_mirror_horiz $const6 	%line{64} %argrw{"wrr"}
+	if		$tmp12 36 36 	%argrw{"r"}
+# jiText_v002.osl:65
+#             base_u = 1-base_u;
+	sub		___338_base_u $const8 ___338_base_u 	%line{65} %argrw{"wrr"}
+# jiText_v002.osl:66
+#         if (mirror_v > 0)
+	gt		$tmp13 mirror_v $const6 	%line{66} %argrw{"wrr"}
+	if		$tmp13 39 39 	%argrw{"r"}
+# jiText_v002.osl:67
+#             base_v = 1-base_v;
+	sub		___338_base_v $const8 ___338_base_v 	%line{67} %argrw{"wrr"}
+# jiText_v002.osl:70
+#         base_u = base_u - offset_u;
+	sub		___338_base_u ___338_base_u offset_u 	%line{70} %argrw{"wrr"}
 # jiText_v002.osl:71
+#         base_v = base_v + offset_v;
+	add		___338_base_v ___338_base_v offset_v 	%line{71} %argrw{"wrr"}
+# jiText_v002.osl:74
+#         vector text_uv = vector(base_u/text_size, 
+	div		$tmp14 ___338_base_u text_size 	%line{74} %argrw{"wrr"}
+# jiText_v002.osl:75
+#                                 base_v/text_size, 
+	div		$tmp15 ___338_base_v text_size 	%line{75} %argrw{"wrr"}
+# jiText_v002.osl:74
+#         vector text_uv = vector(base_u/text_size, 
+	vector		___338_text_uv $tmp14 $tmp15 $const9 	%line{74} %argrw{"wrrr"}
+# jiText_v002.osl:79
+#         string lines[10] = {""};
+	assign		___338_lines $const10 	%line{79} %argrw{"wr"}
+# jiText_v002.osl:80
+#         int new_lines = split(text, lines, "\\n");
+	split		___338_new_lines text ___338_lines $const11 	%line{80} %argrw{"wrwr"}
+# jiText_v002.osl:82
 #         float output_text = 0;
-	assign		___338_output_text $const6 	%line{71} %argrw{"wr"}
-# jiText_v002.osl:73
+	assign		___338_output_text $const6 	%line{82} %argrw{"wr"}
+# jiText_v002.osl:84
 #         for (int l=0; l < arraylength(lines); l++)
-	for		$tmp18 49 52 100 102 	%line{73} %argrw{"r"}
+	for		$tmp18 49 52 103 105 	%line{84} %argrw{"r"}
 	assign		___340_l $const6 	%argrw{"wr"}
 	arraylength	$tmp16 ___338_lines 	%argrw{"wr"}
 	lt		$tmp17 ___340_l $tmp16 	%argrw{"wrr"}
 	neq		$tmp18 $tmp17 $const6 	%argrw{"wrr"}
-# jiText_v002.osl:76
+# jiText_v002.osl:87
 #             string cur_line = lines[l];
-	aref		___341_cur_line ___338_lines ___340_l 	%line{76} %argrw{"wrr"}
-# jiText_v002.osl:77
+	aref		___341_cur_line ___338_lines ___340_l 	%line{87} %argrw{"wrr"}
+# jiText_v002.osl:88
 #             int cur_line_len = strlen(cur_line);
-	strlen		___341_cur_line_len ___341_cur_line 	%line{77} %argrw{"wr"}
-# jiText_v002.osl:78
+	strlen		___341_cur_line_len ___341_cur_line 	%line{88} %argrw{"wr"}
+# jiText_v002.osl:89
 #             if (cur_line_len == 0)
-	eq		$tmp19 ___341_cur_line_len $const6 	%line{78} %argrw{"wrr"}
+	eq		$tmp19 ___341_cur_line_len $const6 	%line{89} %argrw{"wrr"}
 	if		$tmp19 57 57 	%argrw{"r"}
-# jiText_v002.osl:79
+# jiText_v002.osl:90
 #                 break;
-	break	%line{79}
-# jiText_v002.osl:82
+	break	%line{90}
+# jiText_v002.osl:93
 #             float prev_u_size = 0;
-	assign		___341_prev_u_size $const6 	%line{82} %argrw{"wr"}
-# jiText_v002.osl:83
+	assign		___341_prev_u_size $const6 	%line{93} %argrw{"wr"}
+# jiText_v002.osl:94
 #             for (int i=0; i < cur_line_len; i++)
-	for		$tmp21 60 62 98 100 	%line{83} %argrw{"r"}
+	for		$tmp21 60 62 101 103 	%line{94} %argrw{"r"}
 	assign		___342_i $const6 	%argrw{"wr"}
 	lt		$tmp20 ___342_i ___341_cur_line_len 	%argrw{"wrr"}
 	neq		$tmp21 $tmp20 $const6 	%argrw{"wrr"}
-# jiText_v002.osl:88
+# jiText_v002.osl:99
 #                 if (align > 0)
-	gt		$tmp22 align $const6 	%line{88} %argrw{"wrr"}
+	gt		$tmp22 align $const6 	%line{99} %argrw{"wrr"}
 	if		$tmp22 67 68 	%argrw{"r"}
-# jiText_v002.osl:89
+# jiText_v002.osl:100
 #                     ascii = getchar(cur_line, cur_line_len-1-i);
-	sub		$tmp23 ___341_cur_line_len $const7 	%line{89} %argrw{"wrr"}
+	sub		$tmp23 ___341_cur_line_len $const7 	%line{100} %argrw{"wrr"}
 	sub		$tmp24 $tmp23 ___342_i 	%argrw{"wrr"}
 	getchar		___343_ascii ___341_cur_line $tmp24 	%argrw{"wrr"}
-# jiText_v002.osl:91
+# jiText_v002.osl:102
 #                         ascii = getchar(cur_line, i);
-	getchar		___343_ascii ___341_cur_line ___342_i 	%line{91} %argrw{"wrr"}
-# jiText_v002.osl:94
+	getchar		___343_ascii ___341_cur_line ___342_i 	%line{102} %argrw{"wrr"}
+# jiText_v002.osl:105
 #                 string char_path = concat(font_source_split[0], format("%i", ascii), font_source_split[1]);
-	aref		$tmp25 font_source_split $const6 	%line{94} %argrw{"wrr"}
+	aref		$tmp25 font_source_split $const6 	%line{105} %argrw{"wrr"}
 	format		$tmp26 $const12 ___343_ascii 	%argrw{"wrr"}
 	aref		$tmp27 font_source_split $const7 	%argrw{"wrr"}
 	functioncall	$const13 74 	%argrw{"r"}
@@ -250,59 +253,62 @@ code ___main___
 #     return concat(concat(a,b), c);
 	concat		$tmp28 $tmp25 $tmp26 	%filename{"/opt/Autodesk/arnold/7.1.3.0/osl/include/stdosl.h"} %line{433} %argrw{"wrr"}
 	concat		___343_char_path $tmp28 $tmp27 	%argrw{"wrr"}
-# jiText_v002.osl:97
+# jiText_v002.osl:108
 #                 int res[2] = {0};
-	assign		___343_res $const14 	%filename{"jiText_v002.osl"} %line{97} %argrw{"wr"}
-# jiText_v002.osl:98
+	assign		___343_res $const14 	%filename{"jiText_v002.osl"} %line{108} %argrw{"wr"}
+# jiText_v002.osl:109
 #                 if ( gettextureinfo(char_path, "resolution", res) )
-	gettextureinfo	$tmp29 ___343_char_path $const15 ___343_res 	%line{98} %argrw{"wrrw"}
-	if		$tmp29 98 98 	%argrw{"r"}
-# jiText_v002.osl:100
+	gettextureinfo	$tmp29 ___343_char_path $const15 ___343_res 	%line{109} %argrw{"wrrw"}
+	if		$tmp29 101 101 	%argrw{"r"}
+# jiText_v002.osl:111
 #                     float tex_width_factor = float(res[0]) / float(res[1]);
-	aref		$tmp31 ___343_res $const6 	%line{100} %argrw{"wrr"}
+	aref		$tmp31 ___343_res $const6 	%line{111} %argrw{"wrr"}
 	assign		$tmp32 $tmp31 	%argrw{"wr"}
 	assign		$tmp30 $tmp32 	%argrw{"wr"}
 	aref		$tmp34 ___343_res $const7 	%argrw{"wrr"}
 	assign		$tmp35 $tmp34 	%argrw{"wr"}
 	assign		$tmp33 $tmp35 	%argrw{"wr"}
 	div		___344_tex_width_factor $tmp30 $tmp33 	%argrw{"wrr"}
-# jiText_v002.osl:101
-#                     float align_u = (text_uv[0] - (prev_u_size*tracking)) / tex_width_factor;
-	compref		$tmp36 ___338_text_uv $const6 	%line{101} %argrw{"wrr"}
-	mul		$tmp37 ___341_prev_u_size tracking 	%argrw{"wrr"}
-	sub		$tmp38 $tmp36 $tmp37 	%argrw{"wrr"}
-	div		___344_align_u $tmp38 ___344_tex_width_factor 	%argrw{"wrr"}
-# jiText_v002.osl:102
+# jiText_v002.osl:112
+#                     float align_u = (text_uv[0] - prev_u_size + (1-tracking)*i) / tex_width_factor;
+	compref		$tmp36 ___338_text_uv $const6 	%line{112} %argrw{"wrr"}
+	sub		$tmp37 $tmp36 ___341_prev_u_size 	%argrw{"wrr"}
+	sub		$tmp38 $const8 tracking 	%argrw{"wrr"}
+	assign		$tmp40 ___342_i 	%argrw{"wr"}
+	mul		$tmp39 $tmp38 $tmp40 	%argrw{"wrr"}
+	add		$tmp41 $tmp37 $tmp39 	%argrw{"wrr"}
+	div		___344_align_u $tmp41 ___344_tex_width_factor 	%argrw{"wrr"}
+# jiText_v002.osl:113
 #                     if (align > 0) 
-	gt		$tmp39 align $const6 	%line{102} %argrw{"wrr"}
-	if		$tmp39 91 91 	%argrw{"r"}
-# jiText_v002.osl:103
+	gt		$tmp42 align $const6 	%line{113} %argrw{"wrr"}
+	if		$tmp42 94 94 	%argrw{"r"}
+# jiText_v002.osl:114
 #                         align_u = 1-align_u;
-	sub		___344_align_u $const8 ___344_align_u 	%line{103} %argrw{"wrr"}
-# jiText_v002.osl:106
+	sub		___344_align_u $const8 ___344_align_u 	%line{114} %argrw{"wrr"}
+# jiText_v002.osl:117
 # 	                                    text_uv[1] - (l*leading));	
-	compref		$tmp41 ___338_text_uv $const7 	%line{106} %argrw{"wrr"}
-	assign		$tmp43 ___340_l 	%argrw{"wr"}
-	mul		$tmp42 $tmp43 leading 	%argrw{"wrr"}
-	sub		$tmp44 $tmp41 $tmp42 	%argrw{"wrr"}
-# jiText_v002.osl:104
+	compref		$tmp44 ___338_text_uv $const7 	%line{117} %argrw{"wrr"}
+	assign		$tmp46 ___340_l 	%argrw{"wr"}
+	mul		$tmp45 $tmp46 leading 	%argrw{"wrr"}
+	sub		$tmp47 $tmp44 $tmp45 	%argrw{"wrr"}
+# jiText_v002.osl:115
 #                     output_text += texture (char_path, 
-	texture		$tmp40 ___343_char_path ___344_align_u $tmp44 	%line{104} %argrw{"wrrr"} %argderivs{2,3}
-# jiText_v002.osl:106
+	texture		$tmp43 ___343_char_path ___344_align_u $tmp47 	%line{115} %argrw{"wrrr"} %argderivs{2,3}
+# jiText_v002.osl:117
 # 	                                    text_uv[1] - (l*leading));	
-	add		___338_output_text ___338_output_text $tmp40 	%line{106} %argrw{"wrr"}
-# jiText_v002.osl:107
+	add		___338_output_text ___338_output_text $tmp43 	%line{117} %argrw{"wrr"}
+# jiText_v002.osl:118
 #                     prev_u_size += tex_width_factor;
-	add		___341_prev_u_size ___341_prev_u_size ___344_tex_width_factor 	%line{107} %argrw{"wrr"}
-# jiText_v002.osl:83
+	add		___341_prev_u_size ___341_prev_u_size ___344_tex_width_factor 	%line{118} %argrw{"wrr"}
+# jiText_v002.osl:94
 #             for (int i=0; i < cur_line_len; i++)
-	assign		$tmp45 ___342_i 	%line{83} %argrw{"wr"}
+	assign		$tmp48 ___342_i 	%line{94} %argrw{"wr"}
 	add		___342_i ___342_i $const7 	%argrw{"wrr"}
-# jiText_v002.osl:73
+# jiText_v002.osl:84
 #         for (int l=0; l < arraylength(lines); l++)
-	assign		$tmp46 ___340_l 	%line{73} %argrw{"wr"}
+	assign		$tmp49 ___340_l 	%line{84} %argrw{"wr"}
 	add		___340_l ___340_l $const7 	%argrw{"wrr"}
-# jiText_v002.osl:111
+# jiText_v002.osl:122
 #         out = output_text * text_color;
-	mul		out ___338_output_text text_color 	%line{111} %argrw{"wrr"}
+	mul		out ___338_output_text text_color 	%line{122} %argrw{"wrr"}
 	end

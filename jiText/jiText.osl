@@ -109,7 +109,7 @@ shader jiText(
                 if ( gettextureinfo(char_path, "resolution", res) )
                 {
                     float tex_width_factor = float(res[0]) / float(res[1]);
-                    float align_u = (text_uv[0] - (prev_u_size*tracking)) / tex_width_factor;
+                    float align_u = (text_uv[0] - prev_u_size + (1-tracking)*i) / tex_width_factor;
                     if (align > 0) 
                         align_u = 1-align_u;
                     output_text += texture (char_path, 
